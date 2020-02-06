@@ -1699,6 +1699,10 @@ object {
     content: "\e945";
 }
 
+.main-navigation .business > a:before {
+    content: "\e946";
+}
+
 .main-navigation .blogroll > a:before,
 .main-navigation .links > a:before {
     content: "\e946";
