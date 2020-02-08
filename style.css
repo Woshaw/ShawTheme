@@ -1658,6 +1658,10 @@ object {
     content: "\e937";
 }
 
+.main-navigation .document > a:before {
+    content: "\e93f";
+}
+
 .main-navigation .gallery > a:before,
 .main-navigation .photos > a:before {
     content: "\e939";
@@ -1676,8 +1680,44 @@ object {
     content: "\e933";
 }
 
+.main-navigation .computer > a:before {
+    content: "\e925";
+}
+
+.main-navigation .internet > a:before {
+    content: "\e92f";
+}
+
+.main-navigation .development > a:before {
+    content: "\e940";
+}
+
+.main-navigation .design > a:before {
+    content: "\e93d";
+}
+
+.main-navigation .clip > a:before {
+    content: "\e93a";
+}
+
 .main-navigation .resource > a:before {
     content: "\e934";
+}
+
+.main-navigation .project > a:before {
+    content: "\e942";
+}
+
+.main-navigation .material > a:before {
+    content: "\e939";
+}
+
+.main-navigation .tools > a:before {
+    content: "\e93c";
+}
+
+.main-navigation .courseware > a:before {
+    content: "\e93e";
 }
 
 .main-navigation .store > a:before,
