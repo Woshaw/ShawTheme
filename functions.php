@@ -168,6 +168,37 @@ function disable_embeds_flush_rewrite_rules() {
 }
 register_deactivation_hook( __FILE__, 'disable_embeds_flush_rewrite_rules' );
 
+//# Rewites post url of custom post types.
+// function custom_tutorial_link( $link, $post = 0 ){
+
+//     $the_cat  = get_the_category( $post->ID );
+//     $the_id   = $the_cat[0]->category_parent;
+//     $obj      = get_term( $the_id, 'category' );
+//     $cat_slug = !empty( $the_id ) ? $obj->slug . '/' . $the_cat[0]->slug : $the_cat[0]->slug;
+//     $the_str  = $cat_slug . '/' . $post->ID .'.html';
+
+
+//     if ( $post->post_type == 'tutorial' ){
+//         return home_url( 'tutorial/' . $the_str );
+//     } else {
+//         return $link;
+//     }
+// }
+// add_filter('post_type_link', 'custom_tutorial_link', 1, 3 );
+// function tutorial_rewrites_init() {
+//     add_rewrite_rule(
+//         'tutorial/([0-9a-zA-Z]+)?.html$',
+//         'index.php?post_type=tutorial&p=$matches[1]',
+//         'top'
+//     );
+//     add_rewrite_rule(
+//         'tutorial/([0-9a-zA-Z]+)?.html/comment-page-([0-9]{1,})$',
+//         'index.php?post_type=tutorial&p=$matches[1]&cpage=$matches[2]',
+//         'top'
+//     );
+// }
+// add_action( 'init', 'tutorial_rewrites_init' );
+
 /*********************
  * 04. Core Register *
  *********************/

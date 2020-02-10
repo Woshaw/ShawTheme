@@ -19,6 +19,10 @@
                 'pagelink'    => '<span class="screen-reader-text">' . __( 'Page', 'shawtheme' ) . ' </span>%',
                 'separator'   => '<span class="screen-reader-text">, </span>',
             ));
+
+            echo '<pre>';
+            print_r( $post );
+            echo '</pre>';
         ?>
     </div><!-- .entry-content -->
 
