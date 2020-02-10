@@ -184,8 +184,67 @@ function shawtheme_custom_init() {
     remove_post_type_support( 'page', 'custom-fields' );
     remove_post_type_support( 'page', 'revisions' );
 
-    /* Add support for page excerpt. */
+    // Add support for page excerpt.
     add_post_type_support( 'page', array( 'excerpt' ) );
+
+    //# Add post types.
+    register_post_type( 'tutorial', array(
+        'labels'        => array(
+            'name'          => __( 'Tutorials', 'shawtheme' ),
+            'singular_name' => __( 'Tutorial', 'shawtheme' ),
+            'add_new'       => __( 'Add Tutorial', 'shawtheme' ),
+            'search_items'  => __( 'Search Tutorials', 'shawtheme' ),
+            'not_found'     => __( 'No tutorials found.', 'shawtheme' ),
+            'all_items'     => __( 'All Tutorials', 'shawtheme' ),
+        ),
+        'public'        => true,
+        'menu_position' => 6,
+        'menu_icon'     => 'dashicons-laptop',
+        'taxonomies'    => array( 'category', 'post_tag' ),
+        'show_in_rest'  => true,
+        'supports'      => array(
+            'title', 'editor', 'comments', 'excerpt', 'thumbnail', 'custom-fields', 'post-formats'
+        )
+    ) );
+    register_post_type( 'resource', array(
+        'labels'        => array(
+            'name'          => __( 'Resources', 'shawtheme' ),
+            'singular_name' => __( 'Resource', 'shawtheme' ),
+            'add_new'       => __( 'Add Resource', 'shawtheme' ),
+            'search_items'  => __( 'Search Resources', 'shawtheme' ),
+            'not_found'     => __( 'No resources found.', 'shawtheme' ),
+            'all_items'     => __( 'All Resources', 'shawtheme' ),
+        ),
+        'public'        => true,
+        'menu_position' => 7,
+        'menu_icon'     => 'dashicons-archive',
+        'taxonomies'    => array( 'category' ),
+        'show_in_rest'  => true,
+        'supports'      => array(
+            'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'post-formats'
+        )
+    ) );
+
+    //# Add taxonomies.
+    // register_taxonomy( 'subject', 'tutorial', array(
+    //     'labels'            => array(
+    //         'name'          => __( 'Subjects', 'shawtheme' ),
+    //         'singular_name' => __( 'Subject', 'shawtheme' ),
+    //         'add_new_item'  => __( 'Add New Subject', 'shawtheme' ),
+    //         'new_item_name' => __( 'New Subject Name', 'shawtheme' ),
+    //         'parent_item'   => __( 'Parent Subject', 'shawtheme' ),
+    //         'search_items'  => __( 'Search Subjects', 'shawtheme' ),
+    //         'not_found'     => __( 'No subjects found.', 'shawtheme' )
+    //     ),
+    //     'hierarchical'      => true,
+    //     'show_in_rest'      => true,
+    //     'show_admin_column' => true,
+    //     'rewrite'           => array(
+    //         'slug'          => 'tutorial-topics',
+    //         'hierarchical'  => true
+    //     )
+    // ) );
+
 }
 add_action( 'init', 'shawtheme_custom_init' );
 
@@ -362,27 +421,28 @@ add_action( 'wp_enqueue_scripts', 'shawtheme_scripts' );
  * 06. Custom Outputs *
  **********************/
 //# Change archive title output.
-// function shawtheme_archive_title( $title ) {
-//     if ( is_category() ) {
-//         $title = single_cat_title( '', false );
-//     } elseif ( is_tag() ) {
-//         $title = single_tag_title( '', false );
-//     } elseif ( is_author() ) {
-//         $title = '<span class="vcard">' . get_the_author() . '</span>';
-//     } elseif ( is_year() ) {
-//         $title = get_the_date( _x( 'Y', 'yearly archives date format' ) );
-//     } elseif ( is_month() ) {
-//         $title = get_the_date( _x( 'F Y', 'monthly archives date format' ) );
-//     } elseif ( is_day() ) {
-//         $title = get_the_date( _x( 'F j, Y', 'daily archives date format' ) );
-//     } elseif ( is_post_type_archive() ) {
-//         $title = post_type_archive_title( '', false );
-//     } elseif ( is_tax() ) {
-//         $title = single_term_title( '', false );
-//     }
-//     return $title;
-// }
-// add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
+function shawtheme_archive_title( $title ) {
+    if ( is_category() ) {
+        $title = single_cat_title( '', false );
+    }
+    // } elseif ( is_tag() ) {
+    //     $title = single_tag_title( '', false );
+    // } elseif ( is_author() ) {
+    //     $title = '<span class="vcard">' . get_the_author() . '</span>';
+    // } elseif ( is_year() ) {
+    //     $title = get_the_date( _x( 'Y', 'yearly archives date format' ) );
+    // } elseif ( is_month() ) {
+    //     $title = get_the_date( _x( 'F Y', 'monthly archives date format' ) );
+    // } elseif ( is_day() ) {
+    //     $title = get_the_date( _x( 'F j, Y', 'daily archives date format' ) );
+    // } elseif ( is_post_type_archive() ) {
+    //     $title = post_type_archive_title( '', false );
+    // } elseif ( is_tax() ) {
+    //     $title = single_term_title( '', false );
+    // }
+    return $title;
+}
+add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
 
 //# Modifies private/protected post title output.
 function shawtheme_private_title_format( $format ) {
@@ -619,11 +679,10 @@ function shawtheme_get_posts( $query ) {
     //     $query->set( 'post_type', array( 'post', 'portfolio', 'tutorial', 'resource' ) );
     //     return $query;
     // }
-
-    // if ( is_tax( 'post_format' ) && !is_search() && $query->is_main_query() ) {
-    //     $query->set( 'post_type', array( 'post', 'tutorial', 'resource' ) );
-    //     return $query;
-    // }
+    if ( ( is_category() || is_tax( 'post_format' ) ) && !is_search() && $query->is_main_query() ) {
+        $query->set( 'post_type', array( 'post', 'tutorial', 'resource' ) );
+        return $query;
+    }
 
     // if ( is_author() && $query->is_main_query() ) {
     //     $query->set( 'post_type', array( 'post', 'portfolio' ) );
