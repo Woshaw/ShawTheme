@@ -1,6 +1,8 @@
 <?php
 /**
- * <= The home page template file =>
+ * Template Name: Homepage
+ * Template Post Type: page
+ * Description: Homepage page-template for shawtheme.
  * @package ShawTheme
  * @since ShawTheme 1.0.0
  */

@@ -13,7 +13,7 @@ function shawtheme_headline() {
     <div class="site-headline">
     <?php
         // Headline image/video media.
-        if ( is_singular() && has_post_thumbnail() ) {
+        if ( !is_home() && !is_front_page() && is_singular() && has_post_thumbnail() ) {
 
             shawtheme_thumbnail();
 
@@ -37,6 +37,18 @@ function shawtheme_headline() {
                 </div><!-- .headline-summary -->
             </div><!-- .headline-body -->
     <?php
+        elseif ( is_home() && !is_front_page() ) : ?> <!-- 静态博客页 -->
+            <div class="headline-body">
+                <?php
+                    global $wp_query;
+                    $the_id = $wp_query->get_queried_object_id();
+                    printf( '<h1 class="headline-title">%1$s</h1><div class="headline-summary"><p>%2$s</p></div><!-- .headline-summary -->',
+                        single_post_title( '', false ),
+                        get_the_excerpt( $the_id )
+                    );
+                ?>
+            </div><!-- .headline-body -->
+    <?php
         elseif ( is_archive() ) : ?>
             <div class="headline-body">
                 <?php
@@ -45,7 +57,7 @@ function shawtheme_headline() {
                 ?>
             </div><!-- .headline-body -->
     <?php
-        elseif ( is_singular() ) : ?>
+        elseif ( !is_home() && !is_front_page() && is_singular() ) : ?>
             <div class="headline-body">
                 <?php
                     the_title( '<h1 class="headline-title">', '</h1>' );
@@ -63,7 +75,7 @@ function shawtheme_headline() {
  * 2. Breadcrumbs *
  ******************/
 function shawtheme_breadcrumbs() {
-    if ( !is_front_page() && !is_home() || is_paged() ) {
+    if ( !is_front_page() || is_paged() ) {
 
         $delimiter = '<span class="separator" aria-hidden="true">&nbsp;&raquo;&nbsp;</span>';
         $before    = '<span class="current">';
@@ -178,7 +190,11 @@ function shawtheme_breadcrumbs() {
         }
 
         if ( is_home() ) { // Home paged.
-            $output .= $before . __('Posts List', 'shawtheme');
+            if ( is_paged() ) {
+                $output .= $before . __('Posts List', 'shawtheme');
+            } else {
+                $output .= $before . single_post_title( '', false );
+            }
         }
 
         if ( is_404() ) {

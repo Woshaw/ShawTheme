@@ -169,30 +169,30 @@ function disable_embeds_flush_rewrite_rules() {
 register_deactivation_hook( __FILE__, 'disable_embeds_flush_rewrite_rules' );
 
 //# Rewites post url of custom post types.
-// function custom_tutorial_link( $link, $post = 0 ){
+// function custom_tutorial_link( $link, $post = 0 ) {
 
 //     $the_cat  = get_the_category( $post->ID );
 //     $the_id   = $the_cat[0]->category_parent;
-//     $obj      = get_term( $the_id, 'category' );
-//     $cat_slug = !empty( $the_id ) ? $obj->slug . '/' . $the_cat[0]->slug : $the_cat[0]->slug;
-//     $the_str  = $cat_slug . '/' . $post->ID .'.html';
+//     $the_obj  = get_term( $the_id, 'category' );
+//     $cat_slug = !empty( $the_id ) ? $the_obj->slug . '/' . $the_cat[0]->slug : $the_cat[0]->slug;
+//     $the_str  = $cat_slug . '/' . $post->post_name;
 
 
-//     if ( $post->post_type == 'tutorial' ){
-//         return home_url( 'tutorial/' . $the_str );
+//     if ( $post->post_type == 'tutorial' ) {
+//         return home_url( $the_str );
 //     } else {
 //         return $link;
 //     }
 // }
-// add_filter('post_type_link', 'custom_tutorial_link', 1, 3 );
+// add_filter( 'post_type_link', 'custom_tutorial_link', 1, 2 );
 // function tutorial_rewrites_init() {
 //     add_rewrite_rule(
-//         'tutorial/([0-9a-zA-Z]+)?.html$',
+//         'tutorial/([\w&%\-\/\?]+)',
 //         'index.php?post_type=tutorial&p=$matches[1]',
 //         'top'
 //     );
 //     add_rewrite_rule(
-//         'tutorial/([0-9a-zA-Z]+)?.html/comment-page-([0-9]{1,})$',
+//         'tutorial/([\w&%\-\/\?]+)/comment-page-([0-9]{1,})$',
 //         'index.php?post_type=tutorial&p=$matches[1]&cpage=$matches[2]',
 //         'top'
 //     );
@@ -228,11 +228,18 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No tutorials found.', 'shawtheme' ),
             'all_items'     => __( 'All Tutorials', 'shawtheme' ),
         ),
+        'description'   => __( 'Technology sharing, IT industry tutorials.', 'shawtheme' ),
         'public'        => true,
+        // 'show_in_nav_menus' => false,
         'menu_position' => 6,
         'menu_icon'     => 'dashicons-laptop',
-        'taxonomies'    => array( 'category', 'post_tag' ),
+        'has_archive'   => true,
+        'taxonomies'    => array( 'subject', 'label' ),
         'show_in_rest'  => true,
+        'rewrite'       => array(
+            // 'slug'  => 'tutorials',
+            'feeds' => false
+        ),
         'supports'      => array(
             'title', 'editor', 'comments', 'excerpt', 'thumbnail', 'custom-fields', 'post-formats'
         )
@@ -246,35 +253,71 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No resources found.', 'shawtheme' ),
             'all_items'     => __( 'All Resources', 'shawtheme' ),
         ),
+        'description'   => __( 'Provide hundreds of high quality materials.', 'shawtheme' ),
         'public'        => true,
+        // 'show_in_nav_menus' => false,
         'menu_position' => 7,
         'menu_icon'     => 'dashicons-archive',
-        'taxonomies'    => array( 'category' ),
+        'has_archive'   => true,
+        'taxonomies'    => array( 'genre' ),
         'show_in_rest'  => true,
+        'rewrite'       => array( 
+            // 'slug'  => 'resources',
+            'feeds' => false
+        ),
         'supports'      => array(
             'title', 'editor', 'excerpt', 'thumbnail', 'custom-fields', 'post-formats'
         )
     ) );
 
-    //# Add taxonomies.
-    // register_taxonomy( 'subject', 'tutorial', array(
-    //     'labels'            => array(
-    //         'name'          => __( 'Subjects', 'shawtheme' ),
-    //         'singular_name' => __( 'Subject', 'shawtheme' ),
-    //         'add_new_item'  => __( 'Add New Subject', 'shawtheme' ),
-    //         'new_item_name' => __( 'New Subject Name', 'shawtheme' ),
-    //         'parent_item'   => __( 'Parent Subject', 'shawtheme' ),
-    //         'search_items'  => __( 'Search Subjects', 'shawtheme' ),
-    //         'not_found'     => __( 'No subjects found.', 'shawtheme' )
-    //     ),
-    //     'hierarchical'      => true,
-    //     'show_in_rest'      => true,
-    //     'show_admin_column' => true,
-    //     'rewrite'           => array(
-    //         'slug'          => 'tutorial-topics',
-    //         'hierarchical'  => true
-    //     )
-    // ) );
+    # Add taxonomies.
+    register_taxonomy( 'subject', 'tutorial', array(
+        'labels'            => array(
+            'name'          => __( 'Subjects', 'shawtheme' ),
+            'singular_name' => __( 'Subject', 'shawtheme' ),
+            'add_new_item'  => __( 'Add New Subject', 'shawtheme' ),
+            'new_item_name' => __( 'New Subject Name', 'shawtheme' ),
+            'parent_item'   => __( 'Parent Subject', 'shawtheme' ),
+            'search_items'  => __( 'Search Subjects', 'shawtheme' ),
+            'not_found'     => __( 'No subjects found.', 'shawtheme' )
+        ),
+        'hierarchical'      => true,
+        'show_in_rest'      => true,
+        'show_admin_column' => true,
+        'rewrite'           => array(
+            'slug'          => 'tutorials/category',
+            'hierarchical'  => true
+        )
+    ) );
+    register_taxonomy( 'label', 'tutorial', array(
+        'labels'            => array(
+            'name'          => __( 'Labels', 'shawtheme' ),
+            'singular_name' => __( 'Label', 'shawtheme' ),
+            'add_new_item'  => __( 'Add New Label', 'shawtheme' ),
+            'search_items'  => __( 'Search Labels', 'shawtheme' ),
+            'not_found'     => __( 'No labels found.', 'shawtheme' )
+        ),
+        'show_in_rest'      => true,
+        'show_admin_column' => true
+    ) );
+    register_taxonomy( 'genre', 'resource', array(
+        'labels'            => array(
+            'name'          => __( 'Genres', 'shawtheme' ),
+            'singular_name' => __( 'Genre', 'shawtheme' ),
+            'add_new_item'  => __( 'Add New Genre', 'shawtheme' ),
+            'new_item_name' => __( 'New Genre Name', 'shawtheme' ),
+            'parent_item'   => __( 'Parent Genre', 'shawtheme' ),
+            'search_items'  => __( 'Search Genres', 'shawtheme' ),
+            'not_found'     => __( 'No genres found.', 'shawtheme' )
+        ),
+        'hierarchical'      => true,
+        'show_in_rest'      => true,
+        'show_admin_column' => true,
+        'rewrite'           => array(
+            'slug'          => 'resources/category',
+            'hierarchical'  => true
+        )
+    ) );
 
 }
 add_action( 'init', 'shawtheme_custom_init' );
@@ -452,28 +495,49 @@ add_action( 'wp_enqueue_scripts', 'shawtheme_scripts' );
  * 06. Custom Outputs *
  **********************/
 //# Change archive title output.
-function shawtheme_archive_title( $title ) {
-    if ( is_category() ) {
-        $title = single_cat_title( '', false );
-    }
-    // } elseif ( is_tag() ) {
-    //     $title = single_tag_title( '', false );
-    // } elseif ( is_author() ) {
-    //     $title = '<span class="vcard">' . get_the_author() . '</span>';
-    // } elseif ( is_year() ) {
-    //     $title = get_the_date( _x( 'Y', 'yearly archives date format' ) );
-    // } elseif ( is_month() ) {
-    //     $title = get_the_date( _x( 'F Y', 'monthly archives date format' ) );
-    // } elseif ( is_day() ) {
-    //     $title = get_the_date( _x( 'F j, Y', 'daily archives date format' ) );
-    // } elseif ( is_post_type_archive() ) {
-    //     $title = post_type_archive_title( '', false );
-    // } elseif ( is_tax() ) {
-    //     $title = single_term_title( '', false );
-    // }
-    return $title;
-}
-add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
+// function shawtheme_archive_title( $title ) {
+//     if ( is_category() ) {
+//         $title = single_cat_title( '', false );
+//     } elseif ( is_tag() ) {
+//         $title = single_tag_title( '', false );
+//     } elseif ( is_author() ) {
+//         $title = sprintf( __( '<span class="vcard">%s</span>' ), get_the_author() );
+//     } elseif ( is_year() ) {
+//         $title = get_the_date( _x( 'Y', 'yearly archives date format' ) );
+//     } elseif ( is_month() ) {
+//         $title = get_the_date( _x( 'F Y', 'monthly archives date format' ) );
+//     } elseif ( is_day() ) {
+//         $title = get_the_date( _x( 'F j, Y', 'daily archives date format' ) );
+//     } elseif ( is_tax( 'post_format' ) ) {
+//         if ( is_tax( 'post_format', 'post-format-aside' ) ) {
+//             $title = _x( 'Asides', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-gallery' ) ) {
+//             $title = _x( 'Galleries', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-image' ) ) {
+//             $title = _x( 'Images', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-video' ) ) {
+//             $title = _x( 'Videos', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-quote' ) ) {
+//             $title = _x( 'Quotes', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-link' ) ) {
+//             $title = _x( 'Links', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-status' ) ) {
+//             $title = _x( 'Statuses', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-audio' ) ) {
+//             $title = _x( 'Audio', 'post format archive title' );
+//         } elseif ( is_tax( 'post_format', 'post-format-chat' ) ) {
+//             $title = _x( 'Chats', 'post format archive title' );
+//         }
+//     } elseif ( is_post_type_archive() ) {
+//         $title = post_type_archive_title( '', false );
+//     } elseif ( is_tax() ) {
+//         if ( get_queried_object() ) {
+//             $title = single_term_title( '', false );
+//         }
+//     }
+//     return $title;
+// }
+// add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
 
 //# Modifies private/protected post title output.
 function shawtheme_private_title_format( $format ) {
@@ -710,7 +774,7 @@ function shawtheme_get_posts( $query ) {
     //     $query->set( 'post_type', array( 'post', 'portfolio', 'tutorial', 'resource' ) );
     //     return $query;
     // }
-    if ( ( is_category() || is_tax( 'post_format' ) ) && !is_search() && $query->is_main_query() ) {
+    if ( is_tax( 'post_format' ) && !is_search() && $query->is_main_query() ) {
         $query->set( 'post_type', array( 'post', 'tutorial', 'resource' ) );
         return $query;
     }
