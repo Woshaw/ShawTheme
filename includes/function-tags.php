@@ -9,23 +9,30 @@
  * 1. Headline *
  ***************/
 function shawtheme_headline() {
+    global $wp_query;
+    $the_id    = $wp_query->get_queried_object_id();
+    // $the_title = get_the_title( $the_id ) ? get_the_title( $the_id ) : single_post_title( '', false );
 ?>
     <div class="site-headline">
     <?php
         // Headline image/video media.
-        if ( !is_home() && !is_front_page() && is_singular() && has_post_thumbnail() ) {
+        if ( !( is_front_page() && get_header_video_url() ) && has_post_thumbnail( $the_id ) ) {
 
-            shawtheme_thumbnail();
+            printf( '<figure class="wp-custom-header" aria-hidden="true">%s</figure>',
+                get_the_post_thumbnail( $the_id, 'header-thumbnail', array( 'alt' => get_the_title( $the_id ), 'loading' => 'eager' ) )
+            );
 
-        } elseif ( get_header_image() ) {
+        } elseif ( is_front_page() && get_header_video_url() || get_header_image() ) {
 
             the_custom_header_markup();
-
+            
         } else {
-            printf( '<div class="wp-custom-header" aria-hidden="true"><img src="%1$s" width="1200" height="300" alt="%2$s"></div>',
+
+            printf( '<div class="wp-custom-header" aria-hidden="true"><img src="%1$s" width="1200" height="300" %2$s></div>',
                 get_template_directory_uri() . '/assets/img/header_image.jpg',
-                esc_attr( get_bloginfo( 'name', 'display' ) )
+                sprintf( 'alt="%s" loading="eager"', esc_attr( get_bloginfo( 'name', 'display' ) ) )
             );
+
         }
 
         // Headline body.
@@ -37,11 +44,9 @@ function shawtheme_headline() {
                 </div><!-- .headline-summary -->
             </div><!-- .headline-body -->
     <?php
-        elseif ( is_home() && !is_front_page() ) : ?> <!-- 静态博客页 -->
+        elseif ( !( is_front_page() && get_header_video_url() ) && single_post_title( '', false ) ) : ?>
             <div class="headline-body">
                 <?php
-                    global $wp_query;
-                    $the_id = $wp_query->get_queried_object_id();
                     printf( '<h1 class="headline-title">%1$s</h1><div class="headline-summary"><p>%2$s</p></div><!-- .headline-summary -->',
                         single_post_title( '', false ),
                         get_the_excerpt( $the_id )
@@ -54,14 +59,6 @@ function shawtheme_headline() {
                 <?php
                     the_archive_title( '<h1 class="headline-title">', '</h1>' );
                     the_archive_description( '<div class="headline-summary">', '</div><!-- .headline-summary -->' );
-                ?>
-            </div><!-- .headline-body -->
-    <?php
-        elseif ( !is_home() && !is_front_page() && is_singular() ) : ?>
-            <div class="headline-body">
-                <?php
-                    the_title( '<h1 class="headline-title">', '</h1>' );
-                    shawtheme_excerpt();
                 ?>
             </div><!-- .headline-body -->
     <?php
@@ -79,35 +76,51 @@ function shawtheme_breadcrumbs() {
 
         $delimiter = '<span class="separator" aria-hidden="true">&nbsp;&raquo;&nbsp;</span>';
         $before    = '<span class="current">';
-        $output    = '<nav id="crumbs" class="site-breadcrumb" role="navigation" aria-label="' . esc_attr__( 'Breadcrumb', 'shawtheme' ) . '"><h2 class="screen-reader-text">' . __( 'Crumb Navigation', 'shawtheme' ) . '</h2><div class="nav-links"><span class="nav-meta">' . esc_html__( 'You are here', 'shawtheme' ) . ': </span><a class="home-link" href="' . home_url() . '" rel="home">' . esc_html__( 'Home', 'default' ) . '</a>' . $delimiter;
+        $output    = sprintf( '<nav id="crumbs" class="site-breadcrumb" role="navigation" aria-label="%1$s"><h2 class="screen-reader-text">%2$s</h2><div class="nav-links"><span class="nav-meta">%3$s: </span><a class="home-link" href="%4$s" rel="home">%5$s</a>%6$s',
+            esc_attr__( 'Breadcrumb', 'shawtheme' ),
+            __( 'Crumb Navigation', 'shawtheme' ),
+            esc_html__( 'You are here', 'shawtheme' ),
+            home_url(),
+            esc_html__( 'Home', 'default' ),
+            $delimiter
+        );
 
         if ( is_search() || is_archive() ) {
 
+            $the_object = get_queried_object();
+            $the_id     = $the_object->term_id;
+
             if ( is_search() ) { // 搜索结果
 
-                $output .= $before .  esc_html__( 'Searching for', 'shawtheme' ). ': <span class="search-keyword">' . get_search_query() . '</span>';
+                $output .= sprintf( '%1$s%2$s: <span class="search-keyword">%3$s</span>',
+                    $before,
+                    esc_html__( 'Searching for', 'shawtheme' ),
+                    get_search_query()
+                );
 
             } elseif ( is_category() ) { // 分类存档
 
-                $query_obj  = get_queried_object();
-                $this_id    = $query_obj->term_id;
-                $this_cat   = get_category( $this_id );
-                $parent_cat = get_category( $this_cat->parent );
-                if ( $this_cat->parent != 0 ) {
-                    $cat_name = get_category_parents( $parent_cat, true, $delimiter );
-                    $output  .= str_replace( '<a', '<a class="category-link"', $cat_name );
+                $the_cat    = get_category( $the_id );
+                $the_parent = get_category( $the_cat->parent );
+                if ( $the_cat->parent != 0 ) {
+                    $the_cats = get_category_parents( $the_parent, true, $delimiter );
+                    $output  .= str_replace( '<a', '<a class="category-link"', $the_cats );
                 }
                 $output .= $before . single_cat_title( '', false );
 
             } elseif ( is_tag() ) { // 标签存档
 
-                $output .= $before . __( 'Tag Archives', 'shawtheme' ) . ': ' . single_tag_title( '', false );
+                $output .= $before . single_tag_title( '', false );
 
             } elseif ( is_author() ) { // 作者存档
 
                 global $author;
                 $userdata = get_userdata( $author );
-                $output  .= $before . __( 'Author Archives', 'shawtheme' ) . ': ' . $userdata->display_name;
+                $output  .= sprintf( '%1$s%2$s<span class="archived">[%3$s]</span>',
+                    $before,
+                    $userdata->display_name,
+                    esc_html__( 'Author Archives', 'shawtheme' )
+                );
 
             } elseif ( is_date() ) { // 日期存档
 
@@ -117,11 +130,22 @@ function shawtheme_breadcrumbs() {
 
                 if ( is_day() ) { // 每日存档
 
-                    $output .= '<a class="year-link" href="' . $year_link . '">'. $the_year .'</a>' . $delimiter . '<a class="month-link"  href="' . get_month_link( get_the_time( 'Y' ), get_the_time( 'm' ) ) . '">' . $the_month . '</a>' . $delimiter . $before . get_the_time( _x( 'd', 'daily archives date format', 'shawtheme' ) );
+                    $output .= sprintf( '<a class="year-link" href="%1$s">%2$s</a>%3$s<a class="month-link"  href="%4$s">%5$s</a>%3$s%6$s',
+                        $year_link,
+                        $the_year,
+                        $delimiter,
+                        get_month_link( get_the_time( 'Y' ), get_the_time( 'm' ) ),
+                        $the_month,
+                        $before . get_the_time( _x( 'd', 'daily archives date format', 'shawtheme' ) )
+                    );
 
                 } elseif ( is_month() ) { // 月份存档
 
-                    $output .= '<a class="year-link" href="' . $year_link . '">' . $the_year . '</a>' . $delimiter . $before . $the_month;
+                    $output .= sprintf( '<a class="year-link" href="%1$s">%2$s</a>%3$s',
+                        $year_link,
+                        $the_year,
+                        $delimiter . $before . $the_month
+                    );
 
                 } elseif ( is_year() ) { // 年份存档
 
@@ -129,24 +153,28 @@ function shawtheme_breadcrumbs() {
 
                 }
                 
-            } elseif ( current_theme_supports( 'post-formats', get_post_format() ) && is_tax( 'post_format' ) ) { //文章格式
+            } /*elseif ( is_tax( 'post_format' ) && current_theme_supports( 'post-formats', get_post_format() ) ) { //文章格式
 
-                $output .= $before . __('Post Formats', 'shawtheme') . ': ' . get_post_format_string( get_post_format() );
+                $output .= $before . get_post_format_string( get_post_format() );
 
-            } elseif ( is_post_type_archive() ) {
-                /* translators: Post type archive title. %s: Post type name. */
-                // $title = sprintf( __( 'Archives: %s' ), post_type_archive_title( '', false ) );
+            }*/ elseif ( is_post_type_archive() ) {
+
+                $output .= $before . post_type_archive_title( '', false );
+
             } elseif ( is_tax() ) {
-                // $queried_object = get_queried_object();
-                // if ( $queried_object ) {
-                //     $tax = get_taxonomy( $queried_object->taxonomy );
-                //      translators: Taxonomy term archive title. 1: Taxonomy singular name, 2: Current taxonomy term. 
-                //     $title = sprintf( __( '%1$s: %2$s' ), $tax->labels->singular_name, single_term_title( '', false ) );
-                // }
+
+                $the_term   = get_term( $the_id );
+                $the_tax    = get_taxonomy( $the_object->taxonomy );
+                $the_trems  = get_term_parents_list( $the_id, $the_tax->name, array( 'separator' => $delimiter, 'inclusive' => false ) );
+                if ( !is_wp_error( $the_trems ) && $the_term->parent != 0 ) {
+                    $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_trems );
+                }
+                $output .= $before . single_term_title( '', false );
+
             }
 
             if ( !have_posts() ) { // 无内容
-                $output .= '<span class="voided">[' .  esc_html__( 'No Content', 'shawtheme' ) . ']</span>';
+                $output .= sprintf( '<span class="voided">[%s]</span>', esc_html__( 'No Content', 'shawtheme' ) );
             }
 
         } elseif ( is_singular() ) {
@@ -162,6 +190,18 @@ function shawtheme_breadcrumbs() {
                 if ( !is_wp_error( $parents ) ) { // Categories of single post.
                     $output .= str_replace ( '<a', '<a class="category-link"', $parents );
                 }
+
+                if ( in_array( get_post_type(), array( 'tutorial', 'resource' ) ) ) {
+                    $the_tax   = get_post_type() == 'tutorial' ? 'subject' : 'genre';
+                    $the_terms = get_the_terms( $post->ID, $the_tax );
+                    $the_term  = $the_terms[0];
+                    $the_id    = $the_term->term_id;
+                    $the_parents = get_term_parents_list( $the_id, $the_tax, array( 'separator' => $delimiter ) );
+                    if ( !is_wp_error( $the_parents ) && $the_term->parent != 0 ) { // Taxonomies of custom post type single post.
+                        $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_parents ); 
+                    }
+                }
+
                 if ( $parented ) { // Parent post of attachment/single post.
                     $output .= '<a class="post-link" href="' . get_permalink( $parent_post ) . '">' . $parent_post->post_title . '</a>' . $delimiter;
                 }
@@ -181,28 +221,28 @@ function shawtheme_breadcrumbs() {
 
             }
 
-            $output .= $before . get_the_title(); //# Current content title.
+            $output .= $before . single_post_title( '', false ); //# Current content title.
 
             if ( is_attachment() ) { // 附件
-                $output .= '<span class="attached">[' .  esc_html__( 'Attachment', 'shawtheme' ) . ']</span>';
+                $output .= sprintf( '<span class="attached">[%s]</span>', esc_html__( 'Attachment', 'shawtheme' ) );
             }
 
-        }
+        } elseif ( is_home() ) { // Home paged or static home page.
 
-        if ( is_home() ) { // Home paged.
-            if ( is_paged() ) {
-                $output .= $before . __('Posts List', 'shawtheme');
+            if ( is_front_page() && is_paged() ) {
+                $output .= $before . __( 'Posts List', 'shawtheme' );
             } else {
                 $output .= $before . single_post_title( '', false );
             }
-        }
 
-        if ( is_404() ) {
-            $output .= $before . __('404 Page', 'shawtheme');
+        } elseif ( is_404() ) {
+
+            $output .= $before . __( '404 Page', 'shawtheme' );
+
         }
 
         if ( is_paged() ) { // 分页
-            $output .= '<span class="paged">[' . sprintf( __( 'Page %s', 'shawtheme' ), get_query_var( 'paged' ) ) . ']</span>';
+            $output .= sprintf( '<span class="paged">[%s]</span>', sprintf( __( 'Page %s', 'shawtheme' ), get_query_var( 'paged' ) ) );
         }
 
         $output   .= '</span></div></nav>';
@@ -254,14 +294,14 @@ function shawtheme_number_format( $num ) {
  *****************/
 //# Post thumbnail.
 function shawtheme_thumbnail() {
-    if ( is_singular() && has_post_thumbnail() ) {
+    /*if ( is_singular() && has_post_thumbnail() ) {
     ?>
         <figure class="wp-custom-header" aria-hidden="true"><?php the_post_thumbnail( 'header-thumbnail' ); ?></figure>
     <?php
-    } elseif ( !in_the_loop() && is_home() && is_sticky() && !is_paged() || is_search() ) {
+    } else*/if ( !in_the_loop() && is_home() && is_sticky() && !is_paged() || is_search() ) {
         if ( has_post_thumbnail() ) {
     ?>
-        <a class="post-thumbnail ratio-8to5-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'post-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ) ) ); ?></a>
+        <a class="post-thumbnail ratio-8to5-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'post-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) ); ?></a>
         <?php }
         else {
             printf(
@@ -273,7 +313,7 @@ function shawtheme_thumbnail() {
         }
     } elseif ( has_post_thumbnail() ) {
     ?>
-        <a class="post-thumbnail ratio-4to1-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'entry-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ) ) ); ?></a>
+        <a class="post-thumbnail ratio-4to1-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'entry-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) ); ?></a>
     <?php
     } else {
         printf(
@@ -295,7 +335,8 @@ function new_excerpt_more( $more ) {
 }
 add_filter( 'excerpt_more', 'new_excerpt_more' );
 function shawtheme_excerpt() {
-    if ( !is_singular() ) : ?>
+    if ( !is_singular() ) {
+?>
         <div class="entry-summary">
             <?php if ( post_password_required() && !is_search() ) {
                 the_content();
@@ -303,15 +344,8 @@ function shawtheme_excerpt() {
                 the_excerpt();
             } ?>
         </div><!-- .entry-summary -->
-    <?php
-    elseif ( !in_the_loop() && has_excerpt() ) : ?>
-        <div class="headline-summary">
-            <?php the_excerpt(); ?>
-        </div><!-- .headline-summary -->
-    <?php
-    endif;
-    
-    if ( is_attachment() && in_the_loop() ) {
+<?php
+    } elseif ( is_attachment() && in_the_loop() ) {
         $caption = has_excerpt() ? get_the_excerpt() : get_the_title();
         printf( '<figcaption class="entry-caption wp-caption-text">%s</figcaption>', $caption );
     }
@@ -508,7 +542,7 @@ function shawtheme_entry_meta() {
 
     $split_symbol = _x( ', ', 'Used between list items, there is a space after the comma.', 'shawtheme' );
     $tags_list    = get_the_tag_list( '', $split_symbol );
-    if ( $tags_list && ( is_tag() || is_single() ) ) { // Tags of the post.
+    if ( !is_wp_error( $tags_list ) && ( is_tag() || is_single() ) ) { // Tags of the post.
 
         $tags_arr = explode( $split_symbol, $tags_list );
         $tags_num = count( $tags_arr );

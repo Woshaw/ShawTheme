@@ -8,6 +8,24 @@
 get_header(); ?>
 
     <main id="main" class="site-main" role="main">
+        <?php
+
+            // $queried_object = get_queried_object();
+            // $this_id   = $queried_object->term_id;
+            // $this_term = get_term( $this_id );
+            // $the_tax = get_taxonomy( $queried_object->taxonomy );
+            // if ( $this_term->parent != 0 ) {
+            //     $term_name = get_term_parents_list( $this_id, $the_tax->name, array( 'separator' => $delimiter, 'inclusive' => false ) );
+            //     $output  .= str_replace( '<a', '<a class="taxonomy-link"', $term_name );
+            // }
+
+
+            // if ( $queried_object ) {
+            //     echo '<pre>';
+            //     print_r($taxonomy);
+            //     echo '</pre>';
+            // }
+        ?>
 
         <?php
             if ( have_posts() ) {

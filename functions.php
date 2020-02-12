@@ -279,13 +279,14 @@ function shawtheme_custom_init() {
             'new_item_name' => __( 'New Subject Name', 'shawtheme' ),
             'parent_item'   => __( 'Parent Subject', 'shawtheme' ),
             'search_items'  => __( 'Search Subjects', 'shawtheme' ),
-            'not_found'     => __( 'No subjects found.', 'shawtheme' )
+            'not_found'     => __( 'No subjects found.', 'shawtheme' ),
+            'back_to_items' => __( '← Back to subjects', 'shawtheme' )
         ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
         'rewrite'           => array(
-            'slug'          => 'tutorials/category',
+            // 'slug'          => 'tutorials/category',
             'hierarchical'  => true
         )
     ) );
@@ -295,7 +296,8 @@ function shawtheme_custom_init() {
             'singular_name' => __( 'Label', 'shawtheme' ),
             'add_new_item'  => __( 'Add New Label', 'shawtheme' ),
             'search_items'  => __( 'Search Labels', 'shawtheme' ),
-            'not_found'     => __( 'No labels found.', 'shawtheme' )
+            'not_found'     => __( 'No labels found.', 'shawtheme' ),
+            'back_to_items' => __( '← Back to labels', 'shawtheme' )
         ),
         'show_in_rest'      => true,
         'show_admin_column' => true
@@ -308,13 +310,14 @@ function shawtheme_custom_init() {
             'new_item_name' => __( 'New Genre Name', 'shawtheme' ),
             'parent_item'   => __( 'Parent Genre', 'shawtheme' ),
             'search_items'  => __( 'Search Genres', 'shawtheme' ),
-            'not_found'     => __( 'No genres found.', 'shawtheme' )
+            'not_found'     => __( 'No genres found.', 'shawtheme' ),
+            'back_to_items' => __( '← Back to genres', 'shawtheme' )
         ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
         'rewrite'           => array(
-            'slug'          => 'resources/category',
+            // 'slug'          => 'resources/category',
             'hierarchical'  => true
         )
     ) );
@@ -494,50 +497,24 @@ add_action( 'wp_enqueue_scripts', 'shawtheme_scripts' );
 /**********************
  * 06. Custom Outputs *
  **********************/
-//# Change archive title output.
-// function shawtheme_archive_title( $title ) {
-//     if ( is_category() ) {
-//         $title = single_cat_title( '', false );
-//     } elseif ( is_tag() ) {
-//         $title = single_tag_title( '', false );
-//     } elseif ( is_author() ) {
-//         $title = sprintf( __( '<span class="vcard">%s</span>' ), get_the_author() );
-//     } elseif ( is_year() ) {
-//         $title = get_the_date( _x( 'Y', 'yearly archives date format' ) );
-//     } elseif ( is_month() ) {
-//         $title = get_the_date( _x( 'F Y', 'monthly archives date format' ) );
-//     } elseif ( is_day() ) {
-//         $title = get_the_date( _x( 'F j, Y', 'daily archives date format' ) );
-//     } elseif ( is_tax( 'post_format' ) ) {
-//         if ( is_tax( 'post_format', 'post-format-aside' ) ) {
-//             $title = _x( 'Asides', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-gallery' ) ) {
-//             $title = _x( 'Galleries', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-image' ) ) {
-//             $title = _x( 'Images', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-video' ) ) {
-//             $title = _x( 'Videos', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-quote' ) ) {
-//             $title = _x( 'Quotes', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-link' ) ) {
-//             $title = _x( 'Links', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-status' ) ) {
-//             $title = _x( 'Statuses', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-audio' ) ) {
-//             $title = _x( 'Audio', 'post format archive title' );
-//         } elseif ( is_tax( 'post_format', 'post-format-chat' ) ) {
-//             $title = _x( 'Chats', 'post format archive title' );
-//         }
-//     } elseif ( is_post_type_archive() ) {
-//         $title = post_type_archive_title( '', false );
-//     } elseif ( is_tax() ) {
-//         if ( get_queried_object() ) {
-//             $title = single_term_title( '', false );
-//         }
-//     }
-//     return $title;
-// }
-// add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
+//# Change costom post type archive title output.
+function shawtheme_archive_title( $title ) {
+    if ( is_post_type_archive() ) {
+        $title = post_type_archive_title( '', false );
+    } elseif ( is_tax() ) {
+        $queried_object = get_queried_object();
+        if ( $queried_object ) {
+            $tax = get_taxonomy( $queried_object->taxonomy );
+            if ( in_array( $tax->name, array( 'subject', 'genre' ) ) ) {
+                $title = sprintf( __( 'Category: %s', 'default' ), single_term_title( '', false ) );
+            } elseif ( $tax->name == 'label' ) {
+                $title = sprintf( __( 'Tag: %s', 'default' ), single_term_title( '', false ) );
+            }
+        }
+    }
+    return $title;
+}
+add_filter( 'get_the_archive_title', 'shawtheme_archive_title' );
 
 //# Modifies private/protected post title output.
 function shawtheme_private_title_format( $format ) {

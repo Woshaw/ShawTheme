@@ -1627,8 +1627,9 @@ object {
 .main-navigation .current-menu-item > a,
 .main-navigation .current-menu-ancestor > a,
 .main-navigation .current-post-ancestor > a,
-.main-navigation .current-page-ancestor > a,
-.site:not(.archive):not(.search) .main-navigation .current_page_parent > a {
+.main-navigation .current-page-ancestor > a/*,
+.blog .main-navigation .current_page_parent > a,
+.single-post .main-navigation .current_page_parent > a*/ {
     color: #fff;
     background-color: #000;
 }

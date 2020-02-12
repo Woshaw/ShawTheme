@@ -11,6 +11,13 @@
     <?php
     // post metadata.
     shawtheme_entry_meta();
+    // $the_terms = get_the_terms( $post->ID, 'subject' );
+    // $the_term  = $the_terms[0];
+    // $the_id    = $the_term->term_id;
+
+    // echo '<pre>';
+    // print_r($the_term);
+    // echo '</pre>';
     ?>
 
     <div class="entry-content">
