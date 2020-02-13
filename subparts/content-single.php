@@ -11,13 +11,6 @@
     <?php
     // post metadata.
     shawtheme_entry_meta();
-    // $the_terms = get_the_terms( $post->ID, 'subject' );
-    // $the_term  = $the_terms[0];
-    // $the_id    = $the_term->term_id;
-
-    // echo '<pre>';
-    // print_r($the_term);
-    // echo '</pre>';
     ?>
 
     <div class="entry-content">
@@ -31,15 +24,6 @@
                 'pagelink'    => '<span class="screen-reader-text">' . __( 'Page', 'shawtheme' ) . ' </span>%',
                 'separator'   => '<span class="screen-reader-text">, </span>',
             ));
-            // echo '<pre>';
-            // $cat      = get_the_category();
-            // // $cat_slug = $cat->slug;
-            // $cat      = get_the_category( $post->ID );
-            // $parent_id = $cat[0]->category_parent;
-            // // $parents = get_the_category( $parent_id );
-            // $obj    = get_term( $parent_id, 'category' );
-            // print_r( $obj );
-            // echo '</pre>';
         ?>
     </div><!-- .entry-content -->
 

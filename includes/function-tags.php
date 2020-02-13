@@ -116,10 +116,10 @@ function shawtheme_breadcrumbs() {
 
                 global $author;
                 $userdata = get_userdata( $author );
-                $output  .= sprintf( '%1$s%2$s<span class="archived">[%3$s]</span>',
+                $output  .= sprintf( '%1$s<span class="archived">[%2$s]</span>%3$s',
                     $before,
-                    $userdata->display_name,
-                    esc_html__( 'Author Archives', 'shawtheme' )
+                    esc_html__( 'Author', 'default' ),
+                    $userdata->display_name
                 );
 
             } elseif ( is_date() ) { // 日期存档
@@ -153,15 +153,11 @@ function shawtheme_breadcrumbs() {
 
                 }
                 
-            } /*elseif ( is_tax( 'post_format' ) && current_theme_supports( 'post-formats', get_post_format() ) ) { //文章格式
-
-                $output .= $before . get_post_format_string( get_post_format() );
-
-            }*/ elseif ( is_post_type_archive() ) {
+            } elseif ( is_post_type_archive() ) {
 
                 $output .= $before . post_type_archive_title( '', false );
 
-            } elseif ( is_tax() ) {
+            } elseif ( is_tax() ) { // 其它分类法
 
                 $the_term   = get_term( $the_id );
                 $the_tax    = get_taxonomy( $the_object->taxonomy );
@@ -169,7 +165,8 @@ function shawtheme_breadcrumbs() {
                 if ( !is_wp_error( $the_trems ) && $the_term->parent != 0 ) {
                     $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_trems );
                 }
-                $output .= $before . single_term_title( '', false );
+                $the_format = is_tax( 'post_format' ) ? sprintf( '<span class="formatted">[%s]</span>', _x( 'Formats', 'post format', 'default' ) ) : null; // 文章格式
+                $output .= $before . $the_format . single_term_title( '', false );
 
             }
 
@@ -197,7 +194,7 @@ function shawtheme_breadcrumbs() {
                     $the_term  = $the_terms[0];
                     $the_id    = $the_term->term_id;
                     $the_parents = get_term_parents_list( $the_id, $the_tax, array( 'separator' => $delimiter ) );
-                    if ( !is_wp_error( $the_parents ) && $the_term->parent != 0 ) { // Taxonomies of custom post type single post.
+                    if ( !is_wp_error( $the_parents ) ) { // Taxonomies of custom post type single post.
                         $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_parents ); 
                     }
                 }
@@ -486,6 +483,19 @@ function shawtheme_get_discussion_data() {
     return $discussion;
 }
 
+//# Post meta checker.
+function shawtheme_has_meta( $metakey ) {
+    if ( $metakey == 'views' ) {
+        $count = post_views_count();
+    } elseif ( $metakey == 'likes' ) {
+        $count = post_likes_count();
+    } elseif ( $metakey == 'comments' ) {
+        $count = get_comments_number();
+    }
+
+    if ( $count > 0 ) return true; else return false;
+}
+
 //# Post meta.
 function shawtheme_entry_meta() {
     $post_link = esc_url( get_permalink() );
@@ -493,24 +503,36 @@ function shawtheme_entry_meta() {
 
     if ( post_type_supports( get_post_type(), 'author' ) && is_multi_author() && ( is_archive() || is_single() ) ) { // Author of the post.
 
-        $class   = is_archive() ? ' has-avatar' : null;
+        $class   = is_archive() ? 'has-avatar' : null;
         $author  = '<span class="author-name">' . get_the_author() . '</span>';
         $author  = is_archive() ? get_avatar( get_the_author_meta( 'user_email' ), 40 ) . $author : $author;
-        $output .= '<span class="post-author' . $class . '"><span class="screen-reader-text">' . _x( 'Author', 'Used before post author name.', 'shawtheme' ) . ': </span><a class="url fn n" rel="author" href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . $author . '</a></span> ';
+        $output .= sprintf( '<span class="post-author %1$s"><span class="screen-reader-text">%2$s: </span><a class="url fn n" rel="author" href="%3$s">%4$s</a></span> ',
+            $class,
+            _x( 'Author', 'Used before post author name.', 'shawtheme' ),
+            esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+            $author
+        );
 
     }
 
     if (  is_search() || is_date() || is_single() ) { // Publish date of the post.
 
         $the_date = '<time class="entry-date published" datetime="' . esc_attr( get_the_date( 'c' ) ) . '">' . get_the_date() . '</time>';
-        $the_date =  get_post_type() == 'post' && !is_date() ? '<a href="' . get_month_link( get_the_time('Y'), get_the_time('m') ) . '">' . $the_date . '</a>' : $the_date;
-        $output  .= '<span class="post-date"><span class="screen-reader-text">' . _x( 'Publish date', 'Used before publish date.', 'shawtheme' ) . ': </span>' . $the_date . '</span> ';
+        $the_date =  is_singular( 'post' ) ? '<a href="' . get_month_link( get_the_time('Y'), get_the_time('m') ) . '">' . $the_date . '</a>' : $the_date;
+        $output  .= sprintf( '<span class="post-date"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Publish date', 'Used before publish date.', 'shawtheme' ),
+            $the_date
+        );
 
     }
 
     if ( is_home() || is_post_type_archive() ) { // Publish time of the post.
 
-        $output .= '<span class="post-time"><span class="screen-reader-text">' . _x( 'Publish time', 'Used before publish time.', 'shawtheme' ) . ': </span><a  rel="bookmark" href="' . $post_link . '">' . shawtheme_time_format( get_gmt_from_date( get_the_time( 'Y-m-d G:i:s' ) ) ) . '</a></span> ';
+        $output .= sprintf( '<span class="post-time"><span class="screen-reader-text">%1$s: </span><a  rel="bookmark" href="%2$s">%3$s</a></span> ',
+            _x( 'Publish time', 'Used before publish time.', 'shawtheme' ),
+            $post_link,
+            shawtheme_time_format( get_gmt_from_date( get_the_time( 'Y-m-d G:i:s' ) ) )
+        );
 
     }
 
@@ -519,30 +541,45 @@ function shawtheme_entry_meta() {
         $the_type   = get_post_type();
         $the_link   = get_post_type_archive_link( $the_type ) ? get_post_type_archive_link( $the_type ) : $post_link;
         $the_object = get_post_type_object( $the_type );
-        $output    .= '<span class="post-type"><span class="screen-reader-text">' . _x( 'Post type', 'Used before post type.', 'shawtheme' ) . ': </span><a  rel="bookmark" href="' . $the_link . '">' . $the_object->labels->name . '</a></span> ';
+        $output    .= sprintf( '<span class="post-type"><span class="screen-reader-text">%1$s: </span><a  rel="bookmark" href="%2$s">%3$s</a></span> ',
+            _x( 'Post type', 'Used before post type.', 'shawtheme' ),
+            $the_link,
+            $the_object->labels->name
+        );
 
     }
 
-    $format = get_post_format();
-    if ( current_theme_supports( 'post-formats', $format ) && post_type_supports( get_post_type(), 'post-formats' ) && ( is_search() || is_tax( 'post_format' ) || is_single() ) ) { // Format of the post.
+    if ( has_post_format() && ( is_search() || is_tax( 'post_format' ) || is_single() ) ) { // Format of the post.
 
+        $format     = get_post_format();
         $the_string = get_post_format_string( $format );
         $the_format = is_tax( 'post_format' ) ? $the_string : '<a href="' . esc_url( get_post_format_link( $format ) ) . '">' . $the_string . '</a>';
-        $output    .= '<span class="post-format"><span class="screen-reader-text">' .  _x( 'Format', 'Used before post format.', 'shawtheme' ) . ': </span>'. $the_format . '</span> ';
+        $output    .= sprintf( '<span class="post-format"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Format', 'Used before post format.', 'shawtheme' ),
+            $the_format
+        );
 
     }
 
-    $categories_list  = get_the_category_list( ',' );
-    if ( $categories_list && ( is_category() || is_search() || is_single() ) ) { // Category of the post.
+    $category_list = get_the_category_list( ',' );
+    $taxonomy_name = get_post_type() == 'tutorial' ? 'subject' : 'genre';
+    $taxonomy_list = get_the_term_list( $post->ID, $taxonomy_name, '', ',' );
+    $cats_list     = has_category() ? $category_list : $taxonomy_list;
+    if ( $cats_list && !is_wp_error( $cats_list ) && ( is_category() || is_tax( $taxonomy_name ) || is_search() || is_single() ) ) { // Categories of the post.
 
-        $categories = explode( ',', $categories_list );
-        $output    .= '<span class="post-category"><span class="screen-reader-text">' . _x( 'Category', 'Used before category name.', 'shawtheme' ) . ': </span>' . reset( $categories ) . '</span> ';
+        $cats    = explode( ',', $cats_list );
+        $output .= sprintf( '<span class="post-category"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Category', 'Used before category name.', 'shawtheme' ),
+            reset( $cats )
+        );
 
     }
 
-    $split_symbol = _x( ', ', 'Used between list items, there is a space after the comma.', 'shawtheme' );
-    $tags_list    = get_the_tag_list( '', $split_symbol );
-    if ( !is_wp_error( $tags_list ) && ( is_tag() || is_single() ) ) { // Tags of the post.
+    $split_symbol = _x( ', ', 'Used between tag list items, there is a space after the comma.', 'shawtheme' );
+    $tag_list     = get_the_tag_list( '', $split_symbol );
+    $label_list   = get_the_term_list( $post->ID, 'label', '', $split_symbol );
+    $tags_list    = has_tag() ? $tag_list : $label_list;
+    if ( $tags_list && !is_wp_error( $tags_list ) && ( is_tag() || is_tax( 'label' ) || is_single() ) ) { // Tags of the post.
 
         $tags_arr = explode( $split_symbol, $tags_list );
         $tags_num = count( $tags_arr );
@@ -556,28 +593,39 @@ function shawtheme_entry_meta() {
         } else {
             $tags = $tags_list;
         }
-        $output .= '<span class="post-tags"><span class="screen-reader-text">' . _x( 'Tags', 'Used before tag names.', 'shawtheme' ) . ': </span>' . $tags . '</span> ';
+        $output .= sprintf( '<span class="post-tags"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Tags', 'Used before tag names.', 'shawtheme' ),
+            $tags
+        );
 
     }
 
     if ( is_attachment() && wp_attachment_is_image() ) { // Size of the image attachment.
 
-         $output .= '<span class="image-size"><span class="screen-reader-text">' . esc_html_x( 'Full size', 'Used before full size attachment link.', 'shawtheme' ) . ': </span><a target="_blank" href="' . esc_url( wp_get_attachment_url() ) . '">' . absint( wp_get_attachment_metadata()['width'] ) . '&times;' . absint( wp_get_attachment_metadata()['height'] ) . '</a></span> ';
+        $output .= sprintf( '<span class="image-size"><span class="screen-reader-text">%1$s: </span><a target="_blank" href="%2$s">%3$s&times;%4$s</a></span> ',
+            esc_html_x( 'Full size', 'Used before full size attachment link.', 'shawtheme' ),
+            esc_url( wp_get_attachment_url() ),
+            absint( wp_get_attachment_metadata()['width'] ),
+            absint( wp_get_attachment_metadata()['height'] )
+        );
 
     }
 
     $seize_symbol = _x( '?', 'Used as a counts placeholder for protected posts.', 'shawtheme' );
 
-    if ( in_array( get_post_type(), array( 'post', 'attachment' ) ) ) { // Views count of the post.
+    if ( shawtheme_has_meta( 'views' ) ) { // Views count of the post.
 
         $the_count = !post_password_required() ? post_views_count() : $seize_symbol;
         $the_views = __( 'Views', 'shawtheme' ) . '(' . $the_count . ')';
         $the_views = !is_single() ? '<a href="' . $post_link . '#content">' . $the_views . '</a>' : $the_views;
-        $output   .= '<span class="post-views"><span class="screen-reader-text">' . _x( 'Views count', 'Used before post views.', 'shawtheme' ) . ': </span>' . $the_views . '</span> ';
+        $output   .= sprintf( '<span class="post-views"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Views count', 'Used before post views.', 'shawtheme' ),
+            $the_views
+        );
 
     }
 
-    if ( in_array( get_post_type(), array( 'post' ) ) ) { // Likes count of the post.
+    if ( shawtheme_has_meta( 'likes' ) ) { // Likes count of the post.
 
         $the_count = !post_password_required() ? post_likes_count() : $seize_symbol;
         $the_likes = __( 'Likes', 'shawtheme' ) . '(<span class="count">' . $the_count . '</span>)';
@@ -592,21 +640,27 @@ function shawtheme_entry_meta() {
             $output .= '';
         } else {
             $discussion  = shawtheme_get_discussion_data();
-            $class       = !empty( $discussion ) && is_singular() ? ' has-avatar' : null;
-            $the_avatars = !empty( $discussion ) && is_singular() ? shawtheme_comment_avatars_markup( $discussion->authors ) : null;
+            $switch      = is_singular() && !empty( $discussion ) && shawtheme_has_meta( 'comments' ) ? true : false;
+            $class       = $switch ? ' has-avatar' : null;
+            $the_avatars = $switch ? shawtheme_comment_avatars_markup( $discussion->authors ) : null;
             if ( !comments_open() && !post_password_required() ) { $seize_symbol = '&times;'; }
-            $anchor      = get_comments_number() > 0 ? '#comments' : '#respond';
+            $anchor      = shawtheme_has_meta( 'comments' ) ? '#comments' : '#respond';
             $the_count   = !post_password_required() && ( comments_open() || get_comments_number() ) ? number_format_i18n( get_comments_number() ) : $seize_symbol;
             $comments    = __( 'Comments', 'default' ) . '(' . $the_count . ')';
             $comments    = !post_password_required() && ( comments_open() || get_comments_number() ) ? '<a href="' . $post_link . $anchor . '">' . $comments . '</a>' : $comments;
-            $output     .= '<span class="post-comments' . $class . '"><span class="screen-reader-text">' . _x( 'Comments count', 'Used before post comments.', 'shawtheme' ) . ': </span>' . $the_avatars . $comments . '</span> ';
+            $output     .= '<span class="post-comments' . $class . '"><span class="screen-reader-text">' . _x( 'Comments count', 'Used before post comments.', 'shawtheme' ) . ': </span>' . $the_avatars . $comments . '</span>';
         }
 
     }
 
     if ( current_user_can( 'edit_post' ) ) { // Edit link of the post.
 
-        $output .= '<span class="post-editor"><span class="screen-reader-text">' . __( 'Edit link', 'shawtheme' ) . ': </span><a class="post-edit-link" href="' . get_edit_post_link() . '">' . __( 'Edit', 'default' ) . ' <span class="screen-reader-text">' . get_the_title() . '</span></a></span>';
+        $output .= sprintf( '<span class="post-editor"><span class="screen-reader-text">%1$s: </span><a class="post-edit-link" href="%2$s">%3$s<span class="screen-reader-text">%4$s</span></a></span>',
+            __( 'Edit link', 'shawtheme' ),
+            get_edit_post_link(),
+            __( 'Edit', 'default' ),
+            get_the_title()
+        );
 
     }
 
