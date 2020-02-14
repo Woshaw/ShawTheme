@@ -291,11 +291,7 @@ function shawtheme_number_format( $num ) {
  *****************/
 //# Post thumbnail.
 function shawtheme_thumbnail() {
-    /*if ( is_singular() && has_post_thumbnail() ) {
-    ?>
-        <figure class="wp-custom-header" aria-hidden="true"><?php the_post_thumbnail( 'header-thumbnail' ); ?></figure>
-    <?php
-    } else*/if ( !in_the_loop() && is_home() && is_sticky() && !is_paged() || is_search() ) {
+    if ( is_front_page() /*&& is_sticky() && !is_paged()*/ || is_search() ) {
         if ( has_post_thumbnail() ) {
     ?>
         <a class="post-thumbnail ratio-8to5-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'post-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) ); ?></a>
@@ -553,7 +549,7 @@ function shawtheme_entry_meta() {
 
         $format     = get_post_format();
         $the_string = get_post_format_string( $format );
-        $the_format = is_tax( 'post_format' ) ? $the_string : '<a href="' . esc_url( get_post_format_link( $format ) ) . '">' . $the_string . '</a>';
+        $the_format = is_tax( 'post_format' ) && !is_search() ? $the_string : '<a href="' . esc_url( get_post_format_link( $format ) ) . '">' . $the_string . '</a>';
         $output    .= sprintf( '<span class="post-format"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
             _x( 'Format', 'Used before post format.', 'shawtheme' ),
             $the_format
@@ -630,7 +626,10 @@ function shawtheme_entry_meta() {
         $the_count = !post_password_required() ? post_likes_count() : $seize_symbol;
         $the_likes = __( 'Likes', 'shawtheme' ) . '(<span class="count">' . $the_count . '</span>)';
         $the_likes = !post_password_required() ? '<a href="' . $post_link . '#post-likes">' . $the_likes . '</a>' : $the_likes;
-        $output   .= '<span class="post-likes"><span class="screen-reader-text">' . _x( 'Likes count', 'Used before post likes.', 'shawtheme' ) . ': </span>' . $the_likes . '</span> ';
+        $output   .= sprintf( '<span class="post-likes"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
+            _x( 'Likes count', 'Used before post likes.', 'shawtheme' ),
+            $the_likes
+        );
 
     }
 
@@ -640,15 +639,20 @@ function shawtheme_entry_meta() {
             $output .= '';
         } else {
             $discussion  = shawtheme_get_discussion_data();
-            $switch      = is_singular() && !empty( $discussion ) && shawtheme_has_meta( 'comments' ) ? true : false;
-            $class       = $switch ? ' has-avatar' : null;
-            $the_avatars = $switch ? shawtheme_comment_avatars_markup( $discussion->authors ) : null;
+            $switch_a    = is_singular() && !empty( $discussion ) && shawtheme_has_meta( 'comments' ) ? true : false;
+            $switch_b    = !post_password_required() && ( comments_open() || get_comments_number() ) ? true : false;
+            $class       = $switch_a ? 'has-avatar' : null;
+            $the_avatars = $switch_a ? shawtheme_comment_avatars_markup( $discussion->authors ) : null;
             if ( !comments_open() && !post_password_required() ) { $seize_symbol = '&times;'; }
             $anchor      = shawtheme_has_meta( 'comments' ) ? '#comments' : '#respond';
-            $the_count   = !post_password_required() && ( comments_open() || get_comments_number() ) ? number_format_i18n( get_comments_number() ) : $seize_symbol;
+            $the_count   = $switch_b ? number_format_i18n( get_comments_number() ) : $seize_symbol;
             $comments    = __( 'Comments', 'default' ) . '(' . $the_count . ')';
-            $comments    = !post_password_required() && ( comments_open() || get_comments_number() ) ? '<a href="' . $post_link . $anchor . '">' . $comments . '</a>' : $comments;
-            $output     .= '<span class="post-comments' . $class . '"><span class="screen-reader-text">' . _x( 'Comments count', 'Used before post comments.', 'shawtheme' ) . ': </span>' . $the_avatars . $comments . '</span>';
+            $comments    = $switch_b ? '<a href="' . $post_link . $anchor . '">' . $comments . '</a>' : $comments;
+            $output     .= sprintf('<span class="post-comments %1$s"><span class="screen-reader-text">%2$s: </span>%3$s</span>',
+                $class,
+                _x( 'Comments count', 'Used before post comments.', 'shawtheme' ),
+                $the_avatars . $comments
+            );
         }
 
     }
@@ -702,11 +706,11 @@ function shawtheme_custom_sidebar() {
         printf( '<section class="widget widget_categories area"><h3 class="widget-title">%1$s</h3><ul class="categories-list" role="list">%2$s</ul></section>',
             __( 'All Categories', 'default' ),
             wp_list_categories( array(
-                'echo' => 0,
+                'echo'         => 0,
                 'hierarchical' => 1,
-                'separator' => '',
-                'show_count' => 1,
-                'title_li' => ''
+                'separator'    => '',
+                'show_count'   => 1,
+                'title_li'     => ''
             ) )
         );
 
@@ -761,29 +765,64 @@ function shawtheme_custom_sidebar() {
 
     } elseif ( is_tax( 'post_format' ) ) {
 
-        echo '<section class="widget post-formats area"><h3 class="widget-title">' . __( 'Post Formats', 'shawtheme' ) . '</h3><div class="format-links">';
         $post_formats = get_theme_support( 'post-formats' );
         $post_formats = $post_formats[0];
         foreach ( $post_formats as $post_format ) {
-            $format_name = ucfirst( $post_format );
-            printf( '<a class="format-link" href="%1$s/type/%2$s"><img src="%3$s/assets/img/post_format.jpg" alt="%4$s"><span class="format-name"><span>%4$s</span></span></a> ',
+            $format_name   = ucfirst( $post_format );
+            $format_links .= sprintf( '<a class="format-link" href="%1$s/type/%2$s"><img src="%3$s/assets/img/post_format.jpg" alt="%4$s"><span class="format-name"><span>%4$s</span></span></a> ',
                 esc_url( home_url() ),
                 $post_format,
                 esc_url( get_template_directory_uri() ),
                 _x( $format_name, 'Post format', 'default' )
             );
         }
-        echo '</div></section>';
+        printf( '<section class="widget post-formats area"><h3 class="widget-title">%1$s</h3><div class="format-links">%2$s</div></section>',
+            __( 'Post Formats', 'shawtheme' ),
+            $format_links
+        );
         
-    } //elseif ( is_tax( get_post_type(). '_category' ) ) { //自定义Hierarchical taxonomy归档
-    //     printf( '<section class="widget archive-meta"><h3 class="widget-title">%1$s</h3>%2$s</section>',
-    //         __( '分类目录', 'shawtheme' ),
-    //         '目录占位区'
-    //     );
-    // } elseif ( is_tax( get_post_type(). '_tag' ) ) { //自定义Non-hierarchical taxonomy归档
-    //     printf( '<section class="widget archive-meta"><h3 class="widget-title">%1$s</h3>%2$s</section>',
-    //         __( '标签', 'shawtheme' ),
-    //         '标签占位区'
-    //     );
-    // }
+    } /*elseif ( is_post_type_archive() ) {
+        printf( '<section class="widget archive-meta area"><h3 class="widget-title">%1$s</h3><div>%2$s</div></section>',
+            __( 'Archive', 'shawtheme' ),
+            '存档页占位区'
+        );
+    }*/ elseif ( is_tax() ) { // 自定义分类法归档
+        $the_object      = get_queried_object();
+        $the_tax         = get_taxonomy( $the_object->taxonomy );
+        $the_name        = $the_tax->name;
+        $the_description = $the_tax->description;
+        $the_description = $the_description ? sprintf( '<p class="tax-description">%s</p>', esc_html( $the_description ) ) : null;
+        if ( $the_tax->hierarchical ) {
+            printf( '<section class="widget widget_categories area"><h3 class="widget-title">%1$s</h3>%2$s<ul class="categories-list" role="list">%3$s</ul></section>',
+                __( 'All Categories', 'default' ),
+                $the_description,
+                wp_list_categories( array(
+                    'echo'         => 0,
+                    'hierarchical' => 1,
+                    'separator'    => '',
+                    'show_count'   => 1,
+                    'hide_empty'   => 0,
+                    'taxonomy'     => $the_name,
+                    'title_li'     => ''
+                ) )
+            );  
+        } else {
+            printf( '<section class="widget widget_tag_cloud area"><h3 class="widget-title">%1$s</h3>%2$s%3$s</section>',
+                __( 'All Tags', 'default' ),
+                $the_description,
+                wp_tag_cloud( array(
+                    'smallest'   => 1, 
+                    'largest'    => 1,
+                    'unit'       => 'em',
+                    'number'     => 0,
+                    'format'     => 'list',
+                    'separator'  => '',
+                    'show_count' => 1,
+                    'hide_empty' => 0,
+                    'taxonomy'   => $the_name,
+                    'echo'       => 0
+                ) )
+            );
+        }
+    }
 }

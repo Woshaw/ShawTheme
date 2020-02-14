@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ShawTheme-v1.0.0\n"
-"POT-Creation-Date: 2020-02-10 15:46+0800\n"
-"PO-Revision-Date: 2020-02-10 15:46+0800\n"
+"POT-Creation-Date: 2020-02-14 16:32+0800\n"
+"PO-Revision-Date: 2020-02-14 16:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: Foziz Team\n"
 "Language: zh\n"
@@ -49,11 +49,11 @@ msgctxt "Used in comment list title"
 msgid "%s Comments"
 msgstr "%s条评论"
 
-#: comments.php:38 index.php:26 subparts/comment-guestbook.php:68
+#: comments.php:38 index.php:44 subparts/comment-guestbook.php:68
 msgid "Previous"
 msgstr "上页"
 
-#: comments.php:39 index.php:27 subparts/comment-guestbook.php:69
+#: comments.php:39 index.php:45 subparts/comment-guestbook.php:69
 msgid "Next"
 msgstr "下页"
 
@@ -62,7 +62,7 @@ msgctxt "Used before pagination page number."
 msgid "The"
 msgstr "第"
 
-#: comments.php:41 index.php:29 subparts/comment-guestbook.php:71
+#: comments.php:41 index.php:47 subparts/comment-guestbook.php:71
 msgctxt "Used after pagination page number."
 msgid "page"
 msgstr "页"
@@ -84,7 +84,7 @@ msgstr "昵称"
 msgid "Enter Name"
 msgstr "输入昵称"
 
-#: comments.php:62 includes/function-tags.php:638
+#: comments.php:62 includes/function-tags.php:746
 #: subparts/comment-guestbook.php:24
 msgid "Email"
 msgstr "邮箱"
@@ -93,7 +93,7 @@ msgstr "邮箱"
 msgid "Enter Email"
 msgstr "输入邮箱"
 
-#: comments.php:64 includes/function-tags.php:640
+#: comments.php:64 includes/function-tags.php:748
 #: subparts/comment-guestbook.php:26
 msgid "Website"
 msgstr "网址"
@@ -216,7 +216,7 @@ msgstr "后台管理"
 msgid "Username:"
 msgstr "账号："
 
-#: footer.php:93 functions.php:461
+#: footer.php:93 functions.php:564
 msgid "Password:"
 msgstr "密码："
 
@@ -252,314 +252,536 @@ msgstr "顶部导航菜单"
 msgid "Social Links Menu"
 msgstr "社交链接菜单"
 
-#: functions.php:193
+#: functions.php:224
 msgid "Tutorials"
 msgstr "教程"
 
-#: functions.php:194
+#: functions.php:225
 msgid "Tutorial"
 msgstr "教程"
 
-#: functions.php:195
+#: functions.php:226
 msgid "Add Tutorial"
 msgstr "发布教程"
 
-#: functions.php:196
+#: functions.php:227
+msgid "Add New Tutorial"
+msgstr "发布新教程"
+
+#: functions.php:228
+msgid "Edit Tutorial"
+msgstr "编辑教程"
+
+#: functions.php:229
+msgid "View Tutorial"
+msgstr "查看教程"
+
+#: functions.php:230
+msgid "View Tutorials"
+msgstr "查看教程"
+
+#: functions.php:231
 msgid "Search Tutorials"
 msgstr "搜索教程"
 
-#: functions.php:197
+#: functions.php:232
 msgid "No tutorials found."
 msgstr "未找到教程。"
 
-#: functions.php:198
+#: functions.php:233
+msgid "No tutorials found in Trash."
+msgstr "回收站中没有教程。"
+
+#: functions.php:234
+msgid "Parent Tutorial:"
+msgstr "父级教程："
+
+#: functions.php:235
 msgid "All Tutorials"
 msgstr "所有教程"
 
-#: functions.php:211
+#: functions.php:236
+msgid "Tutorial published."
+msgstr "教程已发布。"
+
+#: functions.php:237
+msgid "Tutorial published privately."
+msgstr "教程已私密发布。"
+
+#: functions.php:238
+msgid "Tutorial reverted to draft."
+msgstr "教程已恢复为草稿。"
+
+#: functions.php:239
+msgid "Tutorial scheduled."
+msgstr "教程已计划。"
+
+#: functions.php:240
+msgid "Tutorial updated."
+msgstr "教程已更新。"
+
+#: functions.php:242
+msgid "Teach skills, focus on IT industry tutorials."
+msgstr ""
+
+#: functions.php:261
 msgid "Resources"
 msgstr "资源"
 
-#: functions.php:212
+#: functions.php:262
 msgid "Resource"
 msgstr "资源"
 
-#: functions.php:213
+#: functions.php:263
 msgid "Add Resource"
 msgstr "添加资源"
 
-#: functions.php:214
+#: functions.php:264
+msgid "Add New Resource"
+msgstr "添加新资源"
+
+#: functions.php:265
+msgid "Edit Resource"
+msgstr "编辑资源"
+
+#: functions.php:266
+msgid "View Resource"
+msgstr "查看资源"
+
+#: functions.php:267
+msgid "View Resources"
+msgstr "查看资源"
+
+#: functions.php:268
 msgid "Search Resources"
 msgstr "搜索资源"
 
-#: functions.php:215
+#: functions.php:269
 msgid "No resources found."
-msgstr "未找到资源"
+msgstr "未找到资源。"
 
-#: functions.php:216
+#: functions.php:270
+msgid "No resources found in Trash."
+msgstr "回收站中没有资源。"
+
+#: functions.php:271
 msgid "All Resources"
 msgstr "所有资源"
 
-#: functions.php:255
-msgid "Global Sidebar"
-msgstr "全站侧边栏"
+#: functions.php:272
+msgid "Resource published."
+msgstr "资源已发布。"
 
-#: functions.php:257
-msgid "Add widgets here to appear in your site global right sidebar area."
-msgstr "在这添加小工具到你站点的所有页面的右侧边栏。"
+#: functions.php:273
+msgid "Resource published privately."
+msgstr "资源已私密发布。"
 
-#: functions.php:267
-msgid "Single Sidebar"
-msgstr "单页侧边栏"
+#: functions.php:274
+msgid "Resource reverted to draft."
+msgstr "资源已恢复为草稿。"
 
-#: functions.php:269
-msgid "Add widgets here to appear in your single post right sidebar area."
-msgstr "在这添加小工具到你站点的文章单页的右侧边栏。"
+#: functions.php:275
+msgid "Resource scheduled."
+msgstr "资源已计划。"
 
-#: functions.php:282
-msgid "Post Copyright"
-msgstr "文章版权"
+#: functions.php:276
+msgid "Resource updated."
+msgstr "资源已更新。"
 
-#: functions.php:294 functions.php:296
-msgid "Original"
-msgstr "原创"
+#: functions.php:278
+msgid "Assets sharing, provide high quality resources."
+msgstr ""
 
-#: functions.php:294 functions.php:296
-msgid "Reprint"
-msgstr "转载"
+#: functions.php:298
+msgid "Subjects"
+msgstr "教程类目"
+
+#: functions.php:299
+msgid "Subject"
+msgstr "教程类目"
 
 #: functions.php:300
-msgid "Rights Type"
-msgstr "版权类型"
+msgid "Edit Subject"
+msgstr "编辑教程类目"
+
+#: functions.php:301
+msgid "Update Subject"
+msgstr "更新教程类目"
 
 #: functions.php:302
-msgid "Source Link"
-msgstr "原文链接"
+msgid "Add New Subject"
+msgstr "添加新教程类目"
 
-#: functions.php:354
-msgid "Bold"
+#: functions.php:303
+msgid "New Subject Name"
+msgstr "新教程类目名"
+
+#: functions.php:304
+msgid "Parent Subject"
+msgstr "父级教程类目"
+
+#: functions.php:305
+msgid "Search Subjects"
+msgstr "搜索教程类目"
+
+#: functions.php:306
+msgid "No subjects found."
+msgstr "未找到教程类目。"
+
+#: functions.php:307
+msgid "← Back to subjects"
+msgstr "← 返回教程类目"
+
+#: functions.php:309
+msgid "Taxonomies for tutorial."
 msgstr ""
 
-#: functions.php:355
-msgid "Italic"
-msgstr ""
+#: functions.php:320
+msgid "Labels"
+msgstr "教程标签"
 
-#: functions.php:356
-msgid "Deleted"
-msgstr "删除线"
+#: functions.php:321
+msgid "Label"
+msgstr "教程标签"
 
-#: functions.php:357
-msgid "Deleted text (strikethrough)"
-msgstr ""
+#: functions.php:322
+msgid "Edit Label"
+msgstr "编辑教程标签"
 
-#: functions.php:358
-msgid "Quote"
-msgstr "引用"
+#: functions.php:323
+msgid "Update Label"
+msgstr "更新教程标签"
 
-#: functions.php:359
-msgid "Code"
-msgstr ""
+#: functions.php:324
+msgid "Add New Label"
+msgstr "添加新教程标签"
 
-#: functions.php:360
-msgid "Link"
-msgstr ""
+#: functions.php:325
+msgid "Search Labels"
+msgstr "搜索教程标签"
 
-#: functions.php:361
-msgid "Insert link"
-msgstr ""
+#: functions.php:326
+msgid "No labels found."
+msgstr "未找到教程标签。"
 
-#: functions.php:362
-msgid "Enter the URL"
+#: functions.php:327
+msgid "← Back to labels"
+msgstr "← 返回教程标签"
+
+#: functions.php:335
+msgid "Genres"
+msgstr "资源类目"
+
+#: functions.php:336
+msgid "Genre"
+msgstr "资源类目"
+
+#: functions.php:337
+msgid "Edit Genre"
+msgstr "编辑资源类目"
+
+#: functions.php:338
+msgid "Update Genre"
+msgstr "更新资源类目"
+
+#: functions.php:339
+msgid "Add New Genre"
+msgstr "添加新资源类目"
+
+#: functions.php:340
+msgid "New Genre Name"
+msgstr "新资源类目名"
+
+#: functions.php:341
+msgid "Parent Genre"
+msgstr "父级资源类目"
+
+#: functions.php:342
+msgid "Search Genres"
+msgstr "搜索资源类目"
+
+#: functions.php:343
+msgid "No genres found."
+msgstr "未找到资源类目。"
+
+#: functions.php:344
+msgid "← Back to genres"
+msgstr "← 回到资源类目"
+
+#: functions.php:346
+msgid "Taxonomies for resource."
 msgstr ""
 
 #: functions.php:363
+msgid "Global Sidebar"
+msgstr "全站侧边栏"
+
+#: functions.php:365
+msgid "Add widgets here to appear in your site global right sidebar area."
+msgstr "在这添加小工具到你站点的所有页面的右侧边栏。"
+
+#: functions.php:375
+msgid "Single Sidebar"
+msgstr "单页侧边栏"
+
+#: functions.php:377
+msgid "Add widgets here to appear in your single post right sidebar area."
+msgstr "在这添加小工具到你站点的文章单页的右侧边栏。"
+
+#: functions.php:390
+msgid "Post Copyright"
+msgstr "文章版权"
+
+#: functions.php:402 functions.php:404
+msgid "Original"
+msgstr "原创"
+
+#: functions.php:402 functions.php:404
+msgid "Reprint"
+msgstr "转载"
+
+#: functions.php:408
+msgid "Rights Type"
+msgstr "版权类型"
+
+#: functions.php:410
+msgid "Source Link"
+msgstr "原文链接"
+
+#: functions.php:462
+msgid "Bold"
+msgstr ""
+
+#: functions.php:463
+msgid "Italic"
+msgstr ""
+
+#: functions.php:464
+msgid "Deleted"
+msgstr "删除线"
+
+#: functions.php:465
+msgid "Deleted text (strikethrough)"
+msgstr ""
+
+#: functions.php:466
+msgid "Quote"
+msgstr "引用"
+
+#: functions.php:467
+msgid "Code"
+msgstr ""
+
+#: functions.php:468
+msgid "Link"
+msgstr ""
+
+#: functions.php:469
+msgid "Insert link"
+msgstr ""
+
+#: functions.php:470
+msgid "Enter the URL"
+msgstr ""
+
+#: functions.php:471
 msgid "Image"
 msgstr ""
 
-#: functions.php:364
+#: functions.php:472
 msgid "Insert image"
 msgstr ""
 
-#: functions.php:365
+#: functions.php:473
 msgid "Enter the URL of the image"
 msgstr ""
 
-#: functions.php:366
+#: functions.php:474
 msgid "Enter a description of the image"
 msgstr ""
 
-#: functions.php:367
+#: functions.php:475
 msgid "Emoji"
 msgstr "表情"
 
-#: functions.php:368
+#: functions.php:476
 msgid "Insert emoji"
 msgstr "插入表情"
 
-#: functions.php:369
+#: functions.php:477
 msgid "Help"
 msgstr "帮助"
 
-#: functions.php:370
+#: functions.php:478
 msgid "Close"
 msgstr "关闭"
 
-#: functions.php:371
+#: functions.php:479
 msgid "Smile"
 msgstr "微笑"
 
-#: functions.php:372
+#: functions.php:480
 msgid "Sad"
 msgstr "伤心"
 
-#: functions.php:373
+#: functions.php:481
 msgid "Razz"
 msgstr "调皮"
 
-#: functions.php:374
+#: functions.php:482
 msgid "Roll"
 msgstr "白眼"
 
-#: functions.php:375
+#: functions.php:483
 msgid "Surprise"
 msgstr "惊喜"
 
-#: functions.php:376
+#: functions.php:484
 msgid "Grin"
 msgstr "呲牙"
 
-#: functions.php:377
+#: functions.php:485
 msgid "Cool"
 msgstr "装酷"
 
-#: functions.php:378
+#: functions.php:486
 msgid "Oops"
 msgstr "出糗"
 
-#: functions.php:379
+#: functions.php:487
 msgid "Cry"
 msgstr "哭泣"
 
-#: functions.php:380
+#: functions.php:488
 msgid "Shock"
 msgstr "喷血"
 
-#: functions.php:381
+#: functions.php:489
 msgid "Daze"
 msgstr "发呆"
 
-#: functions.php:382
+#: functions.php:490
 msgid "Beat"
 msgstr "敲打"
 
-#: functions.php:383
+#: functions.php:491
 msgid "Lust"
 msgstr "好色"
 
-#: functions.php:384
+#: functions.php:492
 msgid "Wink"
 msgstr "害羞"
 
-#: functions.php:385
+#: functions.php:493
 msgid "Shut"
 msgstr "闭嘴"
 
-#: functions.php:386
+#: functions.php:494
 msgid "Giggle"
 msgstr "偷笑"
 
-#: functions.php:387
+#: functions.php:495
 msgid "Quit"
 msgstr "无奈"
 
-#: functions.php:388
+#: functions.php:496
 msgid "Crazy"
 msgstr "抓狂"
 
-#: functions.php:389
+#: functions.php:497
 msgid "Mad"
 msgstr "咒骂"
 
-#: functions.php:390
+#: functions.php:498
 msgid "Dizzy"
 msgstr "头晕"
 
-#: functions.php:391
+#: functions.php:499
 msgid "Question"
 msgstr "疑问"
 
-#: functions.php:392
+#: functions.php:500
 msgid "Evil"
 msgstr "阴险"
 
-#: functions.php:393
+#: functions.php:501
 msgid "Sleep"
 msgstr "睡觉"
 
-#: functions.php:394
+#: functions.php:502
 msgid "Hush"
 msgstr "安静"
 
-#: functions.php:408
+#: functions.php:516
 msgid "Expand Menu"
 msgstr "展开主菜单"
 
-#: functions.php:409
+#: functions.php:517
 msgid "Collapse Menu"
 msgstr "折叠主菜单"
 
-#: functions.php:410
+#: functions.php:518
 msgid "Expand Child Menu"
 msgstr "展开子菜单"
 
-#: functions.php:411
+#: functions.php:519
 msgid "Collapse Child Menu"
 msgstr "折叠子菜单"
 
-#: functions.php:412
+#: functions.php:520
 msgid "Notes"
 msgstr "提示"
 
-#: functions.php:413
+#: functions.php:521
 msgid "You already liked this post before."
 msgstr "你已经赞过该文章啦~"
 
-#: functions.php:414
+#: functions.php:522
 msgid "The link has been copied."
 msgstr "链接已复制到剪切板。"
 
-#: functions.php:415
+#: functions.php:523
 msgid "OK"
 msgstr "确定"
 
-#: functions.php:449
+#: functions.php:540
+#, php-format
+msgid "Category: %s"
+msgstr ""
+
+#: functions.php:542
+#, php-format
+msgid "Tag: %s"
+msgstr ""
+
+#: functions.php:552
 msgid "Private"
 msgstr "私密"
 
-#: functions.php:453
+#: functions.php:556
 msgid "Protected"
 msgstr "加密"
 
-#: functions.php:461
+#: functions.php:564
 msgid ""
 "This content is password protected. To view it please enter the password "
 "below:"
 msgstr "此内容已加密，如需访问，请在下方输入密码："
 
-#: functions.php:461
+#: functions.php:564
 msgid "Enter the password here &hellip;"
 msgstr "请输入访问密码…"
 
-#: functions.php:461
+#: functions.php:564
 msgctxt "Used in post password form submit button"
 msgid "Enter"
 msgstr "提交"
 
-#: functions.php:494
+#: functions.php:597
 msgid "Skip to content"
 msgstr "跳至内容"
 
-#: functions.php:498
+#: functions.php:601
 msgid "Back to top"
 msgstr "回到顶部"
 
@@ -571,20 +793,21 @@ msgstr "去搜索页"
 msgid "Go to sidebar"
 msgstr "去侧边栏"
 
-#: home1.php:17
+#: home-x.php:17 templates/templet-homepage.php:19
 msgid "Featured Posts"
-msgstr ""
+msgstr "置顶文章"
 
-#: home1.php:60
+#: home-x.php:60 templates/templet-homepage.php:62
 #, php-format
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: home1.php:69 includes/function-tags.php:559
+#: home-x.php:69 includes/function-tags.php:663
+#: templates/templet-homepage.php:71
 msgid "Edit link"
 msgstr "编辑链接"
 
-#: home1.php:177
+#: home-x.php:177 templates/templet-homepage.php:179
 msgid "No sticky post yet."
 msgstr ""
 
@@ -617,7 +840,7 @@ msgid ""
 "visible after it has been approved."
 msgstr "你的评论正在等待审核。这里是预览，你的评论会在审核通过后显示。"
 
-#: includes/class-comment-walker.php:87 includes/function-tags.php:559
+#: includes/class-comment-walker.php:87 includes/function-tags.php:665
 msgid "Edit"
 msgstr ""
 
@@ -629,265 +852,265 @@ msgstr "ShawTheme设置"
 msgid "Turn on theme stereoscopic."
 msgstr "开启主题立体化样式。"
 
-#: includes/function-tags.php:34
+#: includes/function-tags.php:41
 msgid "Search"
 msgstr ""
 
-#: includes/function-tags.php:70
+#: includes/function-tags.php:80
 msgid "Breadcrumb"
 msgstr ""
 
-#: includes/function-tags.php:70
+#: includes/function-tags.php:81
 msgid "Crumb Navigation"
 msgstr "面包屑导航"
 
-#: includes/function-tags.php:70
+#: includes/function-tags.php:82
 msgid "You are here"
 msgstr "当前位置"
 
-#: includes/function-tags.php:70
+#: includes/function-tags.php:84
 msgid "Home"
 msgstr ""
 
-#: includes/function-tags.php:76
+#: includes/function-tags.php:97
 msgid "Searching for"
 msgstr "正在搜索"
 
-#: includes/function-tags.php:92
-msgid "Tag Archives"
-msgstr "标签归档"
+#: includes/function-tags.php:121
+msgid "Author"
+msgstr ""
 
-#: includes/function-tags.php:98
-msgid "Author Archives"
-msgstr "作者归档"
-
-#: includes/function-tags.php:103
+#: includes/function-tags.php:128
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "Y年"
 
-#: includes/function-tags.php:104
+#: includes/function-tags.php:129
 msgctxt "monthly archives date format"
 msgid "m"
 msgstr "m月"
 
-#: includes/function-tags.php:108
+#: includes/function-tags.php:139
 msgctxt "daily archives date format"
 msgid "d"
 msgstr "d日"
 
-#: includes/function-tags.php:122 includes/function-tags.php:660
-#: subparts/search-filter.php:38
-msgid "Post Formats"
-msgstr "内容格式"
+#: includes/function-tags.php:168
+msgctxt "post format"
+msgid "Formats"
+msgstr ""
 
-#: includes/function-tags.php:137
+#: includes/function-tags.php:174
 msgid "No Content"
 msgstr "无内容"
 
-#: includes/function-tags.php:175
+#: includes/function-tags.php:224
 msgid "Attachment"
 msgstr "附件"
 
-#: includes/function-tags.php:181
+#: includes/function-tags.php:230
 msgid "Posts List"
 msgstr "文章列表"
 
-#: includes/function-tags.php:185
+#: includes/function-tags.php:237
 msgid "404 Page"
 msgstr "404页面"
 
-#: includes/function-tags.php:189
+#: includes/function-tags.php:242
 #, php-format
 msgid "Page %s"
 msgstr "第%s页"
 
-#: includes/function-tags.php:205
+#: includes/function-tags.php:258
 msgid "just now"
 msgstr "刚刚"
 
-#: includes/function-tags.php:207
+#: includes/function-tags.php:260
 msgid "years ago"
 msgstr "年前"
 
-#: includes/function-tags.php:208
+#: includes/function-tags.php:261
 msgid "months ago"
 msgstr "个月前"
 
-#: includes/function-tags.php:209
+#: includes/function-tags.php:262
 msgid "weeks ago"
 msgstr "周前"
 
-#: includes/function-tags.php:210
+#: includes/function-tags.php:263
 msgid "days ago"
 msgstr "天前"
 
-#: includes/function-tags.php:211
+#: includes/function-tags.php:264
 msgid "hours ago"
 msgstr "小时前"
 
-#: includes/function-tags.php:212
+#: includes/function-tags.php:265
 msgid "minutes ago"
 msgstr "分钟前"
 
-#: includes/function-tags.php:213
+#: includes/function-tags.php:266
 msgid "seconds ago"
 msgstr "秒前"
 
-#: includes/function-tags.php:255 includes/function-tags.php:267
+#: includes/function-tags.php:304 includes/function-tags.php:316
 msgid "No featured image"
 msgstr "无缩略图"
 
-#: includes/function-tags.php:310
+#: includes/function-tags.php:353
 msgid ""
 "Reprint content，ask the original author&rsquo;s permission before you "
 "reproduce this post."
 msgstr "本文为转载他人内容，如需转载，请联系原作者。"
 
-#: includes/function-tags.php:310
+#: includes/function-tags.php:353
 msgid ""
 "Original content, do not reproduce this post before you asked author&rsquo;s "
 "permission."
 msgstr "本文为本站原创内容，未经作者许可，请勿转载。"
 
-#: includes/function-tags.php:311
+#: includes/function-tags.php:354
 msgid "Source link"
 msgstr "原文地址"
 
-#: includes/function-tags.php:311
+#: includes/function-tags.php:354
 msgid "Post link"
 msgstr "本文地址"
 
-#: includes/function-tags.php:315
+#: includes/function-tags.php:358
 msgid "Copyright notice"
 msgstr "版权声明"
 
-#: includes/function-tags.php:319
+#: includes/function-tags.php:362
 msgid "Copy the link"
 msgstr "复制链接"
 
-#: includes/function-tags.php:449
+#: includes/function-tags.php:507
 msgctxt "Used before post author name."
 msgid "Author"
 msgstr "作者"
 
-#: includes/function-tags.php:457
+#: includes/function-tags.php:519
 msgctxt "Used before publish date."
 msgid "Publish date"
 msgstr "发布日期"
 
-#: includes/function-tags.php:463
+#: includes/function-tags.php:528
 msgctxt "Used before publish time."
 msgid "Publish time"
 msgstr "发布时间"
 
-#: includes/function-tags.php:472
+#: includes/function-tags.php:541
 msgctxt "Used before post type."
 msgid "Post type"
 msgstr "类型"
 
-#: includes/function-tags.php:481
+#: includes/function-tags.php:554
 msgctxt "Used before post format."
 msgid "Format"
 msgstr "格式"
 
-#: includes/function-tags.php:489
+#: includes/function-tags.php:568
 msgctxt "Used before category name."
 msgid "Category"
 msgstr "分类"
 
-#: includes/function-tags.php:493
-msgctxt "Used between list items, there is a space after the comma."
+#: includes/function-tags.php:574
+msgctxt "Used between tag list items, there is a space after the comma."
 msgid ", "
 msgstr ""
 
-#: includes/function-tags.php:509
+#: includes/function-tags.php:593
 msgctxt "Used before tag names."
 msgid "Tags"
 msgstr "标签"
 
-#: includes/function-tags.php:515
+#: includes/function-tags.php:602
 msgctxt "Used before full size attachment link."
 msgid "Full size"
 msgstr "完整尺寸"
 
-#: includes/function-tags.php:519
+#: includes/function-tags.php:610
 msgctxt "Used as a counts placeholder for protected posts."
 msgid "?"
 msgstr ""
 
-#: includes/function-tags.php:524
+#: includes/function-tags.php:615
 msgid "Views"
 msgstr "浏览"
 
-#: includes/function-tags.php:526
+#: includes/function-tags.php:618
 msgctxt "Used before post views."
 msgid "Views count"
 msgstr "浏览次数"
 
-#: includes/function-tags.php:533
+#: includes/function-tags.php:627
 msgid "Likes"
 msgstr "喜欢"
 
-#: includes/function-tags.php:535
+#: includes/function-tags.php:630
 msgctxt "Used before post likes."
 msgid "Likes count"
 msgstr "点赞次数"
 
-#: includes/function-tags.php:550
+#: includes/function-tags.php:649
 msgid "Comments"
 msgstr "评论"
 
-#: includes/function-tags.php:552
+#: includes/function-tags.php:653
 msgctxt "Used before post comments."
 msgid "Comments count"
 msgstr "评论次数"
 
-#: includes/function-tags.php:579
+#: includes/function-tags.php:687
 msgid "Page Navigation"
 msgstr "页面导航"
 
-#: includes/function-tags.php:599
+#: includes/function-tags.php:707 includes/function-tags.php:795
 msgid "All Categories"
 msgstr ""
 
-#: includes/function-tags.php:612
+#: includes/function-tags.php:720 includes/function-tags.php:808
 msgid "All Tags"
 msgstr ""
 
-#: includes/function-tags.php:629 sidebar.php:35
+#: includes/function-tags.php:737 sidebar.php:35
 msgid "Author&rsquo;s avatar"
 msgstr "作者的头像"
 
-#: includes/function-tags.php:631
+#: includes/function-tags.php:739
 msgid "Author Profile"
 msgstr "作者资料"
 
-#: includes/function-tags.php:632
+#: includes/function-tags.php:740
 msgid "Nicename"
 msgstr "中文名"
 
-#: includes/function-tags.php:635
+#: includes/function-tags.php:743
 msgid "Fullname"
 msgstr "英文名"
 
-#: includes/function-tags.php:642
+#: includes/function-tags.php:750
 msgid "Description"
 msgstr "个人简介"
 
-#: includes/function-tags.php:649
+#: includes/function-tags.php:757
 msgid "Date Archive"
 msgstr "日期归档"
 
-#: includes/function-tags.php:650
+#: includes/function-tags.php:758
 msgid "Select Month"
 msgstr ""
 
-#: includes/function-tags.php:654
+#: includes/function-tags.php:762
 msgid "Blog Calendar"
 msgstr "博客日历"
 
-#: index.php:28
+#: includes/function-tags.php:780 subparts/search-filter.php:38
+msgid "Post Formats"
+msgstr "内容格式"
+
+#: index.php:46
 msgid "No."
 msgstr "第"
 
@@ -1077,6 +1300,12 @@ msgstr "在此输入搜索内容…"
 msgctxt "submit button"
 msgid "Search"
 msgstr ""
+
+#~ msgid "Tag Archives"
+#~ msgstr "标签归档"
+
+#~ msgid "Author Archives"
+#~ msgstr "作者归档"
 
 #~ msgctxt "Used after comments page number."
 #~ msgid "page"

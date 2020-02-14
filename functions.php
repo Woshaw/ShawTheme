@@ -221,14 +221,25 @@ function shawtheme_custom_init() {
     //# Add post types.
     register_post_type( 'tutorial', array(
         'labels'        => array(
-            'name'          => __( 'Tutorials', 'shawtheme' ),
-            'singular_name' => __( 'Tutorial', 'shawtheme' ),
-            'add_new'       => __( 'Add Tutorial', 'shawtheme' ),
-            'search_items'  => __( 'Search Tutorials', 'shawtheme' ),
-            'not_found'     => __( 'No tutorials found.', 'shawtheme' ),
-            'all_items'     => __( 'All Tutorials', 'shawtheme' ),
+            'name'                     => __( 'Tutorials', 'shawtheme' ),
+            'singular_name'            => __( 'Tutorial', 'shawtheme' ),
+            'add_new'                  => __( 'Add Tutorial', 'shawtheme' ),
+            'add_new_item'             => __( 'Add New Tutorial', 'shawtheme' ),
+            'edit_item'                => __( 'Edit Tutorial', 'shawtheme' ),
+            'view_item'                => __( 'View Tutorial', 'shawtheme' ),
+            'view_items'               => __( 'View Tutorials', 'shawtheme' ),
+            'search_items'             => __( 'Search Tutorials', 'shawtheme' ),
+            'not_found'                => __( 'No tutorials found.', 'shawtheme' ),
+            'not_found_in_trash'       => __( 'No tutorials found in Trash.', 'shawtheme' ),
+            'parent_item_colon'        => __( 'Parent Tutorial:', 'shawtheme' ),
+            'all_items'                => __( 'All Tutorials', 'shawtheme' ),
+            'item_published'           => __( 'Tutorial published.', 'shawtheme' ),
+            'item_published_privately' => __( 'Tutorial published privately.', 'shawtheme' ),
+            'item_reverted_to_draft'   => __( 'Tutorial reverted to draft.', 'shawtheme' ),
+            'item_scheduled'           => __( 'Tutorial scheduled.', 'shawtheme' ),
+            'item_updated'             => __( 'Tutorial updated.', 'shawtheme' )
         ),
-        'description'   => __( 'Technology sharing, IT industry tutorials.', 'shawtheme' ),
+        'description'   => __( 'Teach skills, focus on IT industry tutorials.', 'shawtheme' ),
         'public'        => true,
         // 'show_in_nav_menus' => false,
         'menu_position' => 6,
@@ -240,20 +251,31 @@ function shawtheme_custom_init() {
             // 'slug'  => 'tutorials',
             'feeds' => false
         ),
+        'hierarchical'  => true,
         'supports'      => array(
-            'title', 'editor', 'comments', 'excerpt', 'thumbnail', 'custom-fields', 'post-formats'
+            'title', 'editor', 'comments', 'excerpt', 'thumbnail', 'custom-fields', 'page-attributes', 'post-formats'
         )
     ) );
     register_post_type( 'resource', array(
         'labels'        => array(
-            'name'          => __( 'Resources', 'shawtheme' ),
-            'singular_name' => __( 'Resource', 'shawtheme' ),
-            'add_new'       => __( 'Add Resource', 'shawtheme' ),
-            'search_items'  => __( 'Search Resources', 'shawtheme' ),
-            'not_found'     => __( 'No resources found.', 'shawtheme' ),
-            'all_items'     => __( 'All Resources', 'shawtheme' ),
+            'name'                     => __( 'Resources', 'shawtheme' ),
+            'singular_name'            => __( 'Resource', 'shawtheme' ),
+            'add_new'                  => __( 'Add Resource', 'shawtheme' ),
+            'add_new_item'             => __( 'Add New Resource', 'shawtheme' ),
+            'edit_item'                => __( 'Edit Resource', 'shawtheme' ),
+            'view_item'                => __( 'View Resource', 'shawtheme' ),
+            'view_items'               => __( 'View Resources', 'shawtheme' ),
+            'search_items'             => __( 'Search Resources', 'shawtheme' ),
+            'not_found'                => __( 'No resources found.', 'shawtheme' ),
+            'not_found_in_trash'       => __( 'No resources found in Trash.', 'shawtheme' ),
+            'all_items'                => __( 'All Resources', 'shawtheme' ),
+            'item_published'           => __( 'Resource published.', 'shawtheme' ),
+            'item_published_privately' => __( 'Resource published privately.', 'shawtheme' ),
+            'item_reverted_to_draft'   => __( 'Resource reverted to draft.', 'shawtheme' ),
+            'item_scheduled'           => __( 'Resource scheduled.', 'shawtheme' ),
+            'item_updated'             => __( 'Resource updated.', 'shawtheme' )
         ),
-        'description'   => __( 'Provide hundreds of high quality materials.', 'shawtheme' ),
+        'description'   => __( 'Assets sharing, provide high quality resources.', 'shawtheme' ),
         'public'        => true,
         // 'show_in_nav_menus' => false,
         'menu_position' => 7,
@@ -275,6 +297,8 @@ function shawtheme_custom_init() {
         'labels'            => array(
             'name'          => __( 'Subjects', 'shawtheme' ),
             'singular_name' => __( 'Subject', 'shawtheme' ),
+            'edit_item'     => __( 'Edit Subject', 'shawtheme' ),
+            'update_item'   => __( 'Update Subject', 'shawtheme' ),
             'add_new_item'  => __( 'Add New Subject', 'shawtheme' ),
             'new_item_name' => __( 'New Subject Name', 'shawtheme' ),
             'parent_item'   => __( 'Parent Subject', 'shawtheme' ),
@@ -282,6 +306,7 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No subjects found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to subjects', 'shawtheme' )
         ),
+        'description'       => __( 'Subjects of tutorial.', 'shawtheme' ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
@@ -294,18 +319,24 @@ function shawtheme_custom_init() {
         'labels'            => array(
             'name'          => __( 'Labels', 'shawtheme' ),
             'singular_name' => __( 'Label', 'shawtheme' ),
+            'edit_item'     => __( 'Edit Label', 'shawtheme' ),
+            'update_item'   => __( 'Update Label', 'shawtheme' ),
             'add_new_item'  => __( 'Add New Label', 'shawtheme' ),
             'search_items'  => __( 'Search Labels', 'shawtheme' ),
             'not_found'     => __( 'No labels found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to labels', 'shawtheme' )
         ),
+        'description'       => __( 'Labels of tutorial.', 'shawtheme' ),
         'show_in_rest'      => true,
-        'show_admin_column' => true
+        'show_admin_column' => true,
+        // 'show_tagcloud'     => true
     ) );
     register_taxonomy( 'genre', 'resource', array(
         'labels'            => array(
             'name'          => __( 'Genres', 'shawtheme' ),
             'singular_name' => __( 'Genre', 'shawtheme' ),
+            'edit_item'     => __( 'Edit Genre', 'shawtheme' ),
+            'update_item'   => __( 'Update Genre', 'shawtheme' ),
             'add_new_item'  => __( 'Add New Genre', 'shawtheme' ),
             'new_item_name' => __( 'New Genre Name', 'shawtheme' ),
             'parent_item'   => __( 'Parent Genre', 'shawtheme' ),
@@ -313,6 +344,7 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No genres found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to genres', 'shawtheme' )
         ),
+        'description'       => __( 'Genres of resource.', 'shawtheme' ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
@@ -590,11 +622,11 @@ function shawtheme_body_classes( $classes ) {
         $classes[] = 'plural';
     }
 
-    if ( is_search() || is_archive() || is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {
+    if ( is_search() || is_archive() /*&& !is_post_type_archive()*/ || is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {
         $classes[] = 'has-flex-content';
     }
 
-    if ( have_posts() && ( is_home() || is_archive() && !is_search() ) ) {
+    if ( have_posts() && ( is_front_page() || is_home() || is_archive() && !is_search() ) ) {
         $classes[] = 'has-grid-main';
     }
 
