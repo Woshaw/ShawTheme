@@ -17,7 +17,7 @@ get_header(); ?>
             the_post();
 
             // Pages list navigation.
-            shawtheme_page_navigation();
+            shawtheme_list_pages( array( 'tag' => 'nav' ) );
 
             // Include the page content template.
             get_template_part( 'subparts/content', 'page' );

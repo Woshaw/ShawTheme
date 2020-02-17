@@ -7,25 +7,22 @@
  * @since ShawTheme 1.0.0
  */
 
-get_header(); ?>
+get_header(); 
+$more_text = __( 'More >', 'shawtheme' ); ?>
 
     <main id="main" class="site-main" role="main">
 
-        <?php
-            if ( have_posts() ) : ?>
-
-            <section id="slider" class="sticky-posts slider area">
-
-                <h2 class="area-title screen-reader-text"><?php _e( 'Featured Posts', 'shawtheme' ); ?></h2>
-
+            <section id="slider" class="istop sticky-posts slider area">
+                <h2 class="istop-title screen-reader-text"><?php _e( 'Featured Posts', 'shawtheme' ); ?></h2>
                 <?php
-                // Loop 5 sticky posts for home page slider.
+                // Loop 5 sticky posts for page slider.
                 $sticky_posts_query = new WP_Query( array(
                     'post_type'      => 'post',
                     'post__in'       => get_option( 'sticky_posts' ),
                     'posts_per_page' => 5
                 ) );
                 if ( $sticky_posts_query->have_posts() ) : ?>
+
                     <ul class="sticky-posts-list">
                         <?php
                         // Start the loop.
@@ -35,13 +32,31 @@ get_header(); ?>
                                 <?php
                                     the_title(
                                         sprintf(
-                                            '<h1 class="post-title"><a href="%1$s" title="%2$s" rel="bookmark">',
+                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
                                             esc_url( get_permalink() ),
                                             the_title_attribute( 'echo=0' )
                                         ),
                                         '</a></h1>'
                                     );
+
                                     shawtheme_thumbnail();
+
+                                    edit_post_link(
+                                        sprintf(
+                                            wp_kses(
+                                                /* translators: %s: Name of current post. Only visible to screen readers */
+                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
+                                                array(
+                                                    'span' => array(
+                                                        'class' => array(),
+                                                    ),
+                                                )
+                                            ),
+                                            get_the_title()
+                                        ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        '</span>'
+                                    );
                                 ?>
                             </li>
 
@@ -55,22 +70,6 @@ get_header(); ?>
                         <a class="prev" href="javascript:;"> &lt; </a>
                         <a class="next" href="javascript:;"> &gt; </a>
                     </nav>
-                    <?php edit_post_link(
-                        sprintf(
-                            wp_kses(
-                                /* translators: %s: Name of current post. Only visible to screen readers */
-                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
-                                array(
-                                    'span' => array(
-                                        'class' => array(),
-                                    ),
-                                )
-                            ),
-                            get_the_title()
-                        ),
-                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
-                        '</span>'
-                    ); ?>
                         
                     <script type="text/javascript">
                         window.onload = function() {
@@ -179,16 +178,202 @@ get_header(); ?>
                     printf( '<p class="not-found">%s<p>', __( 'No sticky post yet.', 'shawtheme' ) );
 
                 endif; ?>
-
             </section><!-- .sticky-posts -->
 
-        <?php
-            else :
+            <section class="istop recent-posts">
+                <h2 class="istop-title screen-reader-text">
+                    <?php _e( 'Recent Posts', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                </h2>
+                <?php
+                // Loop 6 recent posts.
+                $recent_posts_query = new WP_Query( array(
+                    'post_type'      => 'post',
+                    'posts_per_page' => 6
+                ) );
+                if ( $recent_posts_query->have_posts() ) : ?>
 
-                get_template_part( 'subparts/content', 'none' ); // If no content, include the "No posts found" template.
+                    <ul class="istop-list recent-posts-list">
+                        <?php
+                        // Start the loop.
+                        while ( $recent_posts_query->have_posts() ) : $recent_posts_query->the_post(); ?>
 
-            endif;
-        ?>
+                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                                <?php
+                                    shawtheme_thumbnail();
+
+                                    the_title(
+                                        sprintf(
+                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
+                                            esc_url( get_permalink() ),
+                                            the_title_attribute( 'echo=0' )
+                                        ),
+                                        '</a></h1>'
+                                    );
+
+                                    edit_post_link(
+                                        sprintf(
+                                            wp_kses(
+                                                /* translators: %s: Name of current post. Only visible to screen readers */
+                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
+                                                array(
+                                                    'span' => array(
+                                                        'class' => array(),
+                                                    ),
+                                                )
+                                            ),
+                                            get_the_title()
+                                        ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        '</span>'
+                                    );
+                                ?>
+                            </li>
+
+                        <?php
+                        // End the loop.
+                        endwhile;
+                        ?>
+                    </ul>
+
+                <?php
+                    wp_reset_postdata();
+                else :
+
+                    printf( '<p class="not-found">%s<p>', __( 'No post yet.', 'shawtheme' ) );
+
+                endif; ?>
+            </section><!-- .recent-posts -->
+
+            <section class="istop recent-tutorials">
+                <h2 class="istop-title">
+                    <?php _e( 'Recent Tutorials', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                </h2>
+                <?php
+                // Loop 5 recent tutorials.
+                $recent_tutorials_query = new WP_Query( array(
+                    'post_type'      => 'tutorial',
+                    'posts_per_page' => 5
+                ) );
+                if ( $recent_tutorials_query->have_posts() ) : ?>
+
+                    <ul class="istop-list recent-tutorials-list">
+                        <?php
+                        // Start the loop.
+                        while ( $recent_tutorials_query->have_posts() ) : $recent_tutorials_query->the_post(); ?>
+
+                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                                <?php
+                                    shawtheme_thumbnail();
+
+                                    the_title(
+                                        sprintf(
+                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
+                                            esc_url( get_permalink() ),
+                                            the_title_attribute( 'echo=0' )
+                                        ),
+                                        '</a></h1>'
+                                    );
+
+                                    edit_post_link(
+                                        sprintf(
+                                            wp_kses(
+                                                /* translators: %s: Name of current post. Only visible to screen readers */
+                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
+                                                array(
+                                                    'span' => array(
+                                                        'class' => array(),
+                                                    ),
+                                                )
+                                            ),
+                                            get_the_title()
+                                        ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        '</span>'
+                                    );
+                                ?>
+                            </li>
+
+                        <?php
+                        // End the loop.
+                        endwhile;
+                        ?>
+                    </ul>
+
+                <?php
+                    wp_reset_postdata();
+                else :
+
+                    printf( '<p class="not-found">%s<p>', __( 'No tutorial yet.', 'shawtheme' ) );
+
+                endif; ?>
+            </section><!-- .recent-tutorials -->
+
+            <section class="istop recent-resources">
+                <h2 class="istop-title">
+                    <?php _e( 'Recent Resources', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                </h2>
+                <?php
+                // Loop 5 recent resources.
+                $recent_resources_query = new WP_Query( array(
+                    'post_type'      => 'resource',
+                    'posts_per_page' => 5
+                ) );
+                if ( $recent_resources_query->have_posts() ) : ?>
+
+                    <ul class="istop-list recent-resources-list">
+                        <?php
+                        // Start the loop.
+                        while ( $recent_resources_query->have_posts() ) : $recent_resources_query->the_post(); ?>
+
+                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                                <?php
+                                    shawtheme_thumbnail();
+
+                                    the_title(
+                                        sprintf(
+                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
+                                            esc_url( get_permalink() ),
+                                            the_title_attribute( 'echo=0' )
+                                        ),
+                                        '</a></h1>'
+                                    );
+
+                                    edit_post_link(
+                                        sprintf(
+                                            wp_kses(
+                                                /* translators: %s: Name of current post. Only visible to screen readers */
+                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
+                                                array(
+                                                    'span' => array(
+                                                        'class' => array(),
+                                                    ),
+                                                )
+                                            ),
+                                            get_the_title()
+                                        ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        '</span>'
+                                    );
+                                ?>
+                            </li>
+
+                        <?php
+                        // End the loop.
+                        endwhile;
+                        ?>
+                    </ul>
+
+                <?php
+                    wp_reset_postdata();
+                else :
+
+                    printf( '<p class="not-found">%s<p>', __( 'No resource yet.', 'shawtheme' ) );
+
+                endif; ?>
+            </section><!-- .recent-resources -->
 
     </main><!-- .site-main -->
 

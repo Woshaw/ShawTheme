@@ -10,7 +10,7 @@
  ***************/
 function shawtheme_headline() {
     global $wp_query;
-    $the_id    = $wp_query->get_queried_object_id();
+    $the_id = $wp_query->get_queried_object_id();
     // $the_title = get_the_title( $the_id ) ? get_the_title( $the_id ) : single_post_title( '', false );
 ?>
     <div class="site-headline">
@@ -159,14 +159,15 @@ function shawtheme_breadcrumbs() {
 
             } elseif ( is_tax() ) { // 其它分类法
 
-                $the_term   = get_term( $the_id );
-                $the_tax    = get_taxonomy( $the_object->taxonomy );
-                $the_trems  = get_term_parents_list( $the_id, $the_tax->name, array( 'separator' => $delimiter, 'inclusive' => false ) );
+                // $the_type = get_post_type_object( get_post_type() );
+                $the_term  = get_term( $the_id );
+                $the_tax   = get_taxonomy( $the_object->taxonomy );
+                $the_trems = get_term_parents_list( $the_id, $the_tax->name, array( 'separator' => $delimiter, 'inclusive' => false ) );
                 if ( !is_wp_error( $the_trems ) && $the_term->parent != 0 ) {
                     $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_trems );
                 }
                 $the_format = is_tax( 'post_format' ) ? sprintf( '<span class="formatted">[%s]</span>', _x( 'Formats', 'post format', 'default' ) ) : null; // 文章格式
-                $output .= $before . $the_format . single_term_title( '', false );
+                $output    .= $before . $the_format . single_term_title( '', false );
 
             }
 
@@ -178,44 +179,45 @@ function shawtheme_breadcrumbs() {
             global $post;
             $parented = $post->post_parent;
 
-            if( is_single() ) { //# Posts/attachment or Non-hierarchical post type.
+            $parent_post = get_post( $parented );
+            $categories  = $parented ? get_the_category( $parent_post->ID ) : get_the_category();
+            $category    = $categories[0];
+            $parents     = get_category_parents( $category, true, $delimiter );
+            if ( !is_wp_error( $parents ) ) { // Categories of single post.
+                $output .= str_replace ( '<a', '<a class="category-link"', $parents );
+            }
 
-                $parent_post = get_post( $parented );
-                $categories  = $parented ? get_the_category( $parent_post->ID ) : get_the_category();
-                $category    = $categories[0];
-                $parents     = get_category_parents( $category, true, $delimiter );
-                if ( !is_wp_error( $parents ) ) { // Categories of single post.
-                    $output .= str_replace ( '<a', '<a class="category-link"', $parents );
+            if ( in_array( get_post_type(), array( 'tutorial', 'resource' ) ) ) { //# Taxonomies of custom post type.
+                $the_tax     = get_post_type() == 'tutorial' ? 'subject' : 'genre';
+                $the_terms   = get_the_terms( $post->ID, $the_tax );
+                $the_term    = $the_terms[0];
+                $the_id      = $the_term->term_id;
+                $the_parents = get_term_parents_list( $the_id, $the_tax, array( 'separator' => $delimiter ) );
+                if ( !is_wp_error( $the_parents ) ) { //# Taxonomies of single post with custom post type.
+                    $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_parents ); 
                 }
+            }
 
-                if ( in_array( get_post_type(), array( 'tutorial', 'resource' ) ) ) {
-                    $the_tax   = get_post_type() == 'tutorial' ? 'subject' : 'genre';
-                    $the_terms = get_the_terms( $post->ID, $the_tax );
-                    $the_term  = $the_terms[0];
-                    $the_id    = $the_term->term_id;
-                    $the_parents = get_term_parents_list( $the_id, $the_tax, array( 'separator' => $delimiter ) );
-                    if ( !is_wp_error( $the_parents ) ) { // Taxonomies of custom post type single post.
-                        $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_parents ); 
-                    }
-                }
-
-                if ( $parented ) { // Parent post of attachment/single post.
-                    $output .= '<a class="post-link" href="' . get_permalink( $parent_post ) . '">' . $parent_post->post_title . '</a>' . $delimiter;
-                }
-
-            } elseif ( $parented ) { //# Parents of page or hierarchical post type.
+            if ( $parented ) { //# Parents of page or post with hierarchical post type.
 
                 $pages = array();
                 while ( $parented ) {
                     $parent_page = get_page( $parented );
-                    $pages[]     = '<a class="page-link" href="' . get_permalink( $parent_page->ID ) . '">' . get_the_title( $parent_page->ID ) . '</a>';
+                    $pages[]     = sprintf( '<a class="post-link" href="%1$s">%2$s</a>',
+                        get_permalink( $parent_page->ID ),
+                        get_the_title( $parent_page->ID )
+                    );
                     $parented    = $parent_page->post_parent;
                 }
                 $pages = array_reverse( $pages );
                 foreach ( $pages as $page ) {
                     $output .= $page . $delimiter;
                 }
-
+                // $output .= sprintf( '<a class="post-link" href="%1$s">%2$s</a>%3$s',
+                //     get_permalink( $parent_post ),
+                //     $parent_post->post_title,
+                //     $delimiter
+                // );
             }
 
             $output .= $before . single_post_title( '', false ); //# Current content title.
@@ -242,7 +244,7 @@ function shawtheme_breadcrumbs() {
             $output .= sprintf( '<span class="paged">[%s]</span>', sprintf( __( 'Page %s', 'shawtheme' ), get_query_var( 'paged' ) ) );
         }
 
-        $output   .= '</span></div></nav>';
+        $output .= '</span></div></nav>';
 
         echo $output;
     }
@@ -549,7 +551,8 @@ function shawtheme_entry_meta() {
 
         $format     = get_post_format();
         $the_string = get_post_format_string( $format );
-        $the_format = is_tax( 'post_format' ) && !is_search() ? $the_string : '<a href="' . esc_url( get_post_format_link( $format ) ) . '">' . $the_string . '</a>';
+        $the_link   = esc_url( get_post_format_link( $format ) );
+        $the_format = is_tax( 'post_format' ) && !is_search() ? $the_string : sprintf( '<a href="%1$s">%2$s</a>', $the_link, $the_string );
         $output    .= sprintf( '<span class="post-format"><span class="screen-reader-text">%1$s: </span>%2$s</span> ',
             _x( 'Format', 'Used before post format.', 'shawtheme' ),
             $the_format
@@ -672,23 +675,60 @@ function shawtheme_entry_meta() {
     echo $output;
 }
 
-/**********************
- * 6. Page navigation *
- **********************/
-//# Page navigation.
-function shawtheme_page_navigation() {
+/*****************
+ * 6. Pages list *
+ *****************/
+function shawtheme_list_pages( array $args ) {
+    // Default parameter.
+    $defaults = array(
+        'tag'     => '',
+    );
+
+    $parsed_args = wp_parse_args( $args, $defaults );
+
     global $post;
-    $item_class = $post->post_parent ? null : 'current_page_item';
-    $the_id     = $post->post_parent ? $post->post_parent : $post->ID;
-    $pages_list = wp_list_pages( 'title_li=&child_of=' . $the_id . '&item_spacing=discard&echo=0' );
+    $parented   = $post->post_parent;
+    $the_id     = $parented ? array_reverse( get_post_ancestors( $post->ID ) )[0] : $post->ID;
+    $the_type   = get_post_type( $post->ID );
+    $type_obj   = get_post_type_object( $the_type );
+    $pages_list = wp_list_pages( array(
+        'post_type'    => $the_type,
+        'child_of'     => $the_id,
+        // 'authors'      => get_the_author(),
+        // 'date_format'  => 'Y年n月j日 H:i',
+        // 'depth'        => 0,
+        'echo'         => 0,
+        // 'include'      => $post->ID,
+        // 'link_before'  => '<span class="number">[1]</span><span class="screen-reader-text">',
+        // 'link_after'   => '</span>',
+        // 'show_date'    => 'modified',
+        'sort_column'  => 'menu_order', // or 'post_parent'
+        'title_li'     => '',
+        'item_spacing' => 'discard'
+    ) );
     if ( $pages_list ) {
+        $item_class = $parented ? 'current_page_ancestor' : 'current_page_item';
+        $the_class  = ( $parented == $the_id ) ? ' current_page_parent' : null;
+        if ( $parsed_args['tag'] == 'nav' ) {
+            $the_before = sprintf( '<nav class="navigation page-navigation" role="navigation" aria-label="%1$s"><h2 class="screen-reader-text">%s</h2>',
+                __( 'Page Navigation', 'shawtheme' )
+            );
+            $the_after  = '</nav>';
+        } elseif ( $parsed_args['tag'] == 'section' ) {
+            $the_before = sprintf( '<section class="post-parts area"><h3 class="widget-title">%1$s</h3>',
+                sprintf( _x( '%s Parts', 'Used in pages list title.', 'shawtheme' ), $type_obj->label )
+            );
+            $the_after  = '</section>';
+        }
         printf(
-            '<nav class="navigation page-navigation" role="navigation" aria-label="%1$s"><h2 class="screen-reader-text">%1$s</h2><ul class="page-list"><li class="page_item %2$s page_parent"><a href="%3$s">%4$s</a></li>%5$s</ul></nav>',
-            __( 'Page Navigation', 'shawtheme' ),
-            $item_class,
+            '%1$s<ul class="pages-list"><li class="page_item page-item-%2$s page_item_has_children %3$s"><a href="%4$s">%5$s</a><ul class="children children_main">%6$s</ul></li></ul>%7$s',
+            $the_before,
+            $the_id,
+            $item_class . $the_class,
             esc_url( get_permalink( $the_id ) ),
             get_the_title( $the_id ),
-            $pages_list
+            $pages_list,
+            $the_after
         );
     }
 }
@@ -735,20 +775,30 @@ function shawtheme_custom_sidebar() {
         global $author;
         $userdata = get_userdata( $author );
         $avatar   = get_avatar( $userdata->user_email, 120, $default, __( 'Author&rsquo;s avatar', 'shawtheme' ), array( 'force_display' => true, ) );
-        printf( '<section class="widget author-profile area"><table><thead><tr><th colspan="8">%1$s</th></tr></thead><tbody><tr><td colspan="2">%2$s:</td><td colspan="3">%3$s</td><td colspan="3" rowspan="3">%4$s</td></tr><tr><td colspan="2">%5$s:</td><td colspan="3">%6$s %7$s</td></tr><tr><td colspan="2">%8$s:</td><td colspan="3"><a href="mailto:%9$s">%9$s</a></td></tr><tr><td colspan="2">%10$s:</td><td colspan="6"><a target="_blank" href="%11$s">%11$s</a></td></tr><tr><td colspan="2">%12$s:</td><td colspan="6">%13$s</td></tr></tbody></table></section>',
-            __( 'Author Profile', 'shawtheme' ),
-            __( 'Nicename', 'shawtheme' ),
-            $userdata->display_name,
-            $avatar,
-            __( 'Fullname', 'shawtheme' ),
-            $userdata->first_name,
-            $userdata->last_name,
-            __( 'Email', 'shawtheme' ),
-            $userdata->user_email,
-            __( 'Website', 'shawtheme' ),
-            $userdata->user_url,
-            __( 'Description', 'shawtheme' ),
-            $userdata->description
+        printf( '<section class="widget author-profile area"><table>%1$s<tbody><tr>%2$s</tr><tr>%3$s</tr>%4$s<tr>%5$s</tr></tbody></table></section>',
+            sprintf( '<thead><tr><th colspan="8">%s</th></tr></thead>',
+                __( 'Author Profile', 'shawtheme' )
+            ),
+            sprintf( '<td colspan="2">%1$s:</td><td colspan="3">%2$s</td><td colspan="3" rowspan="3">%3$s</td>',
+                __( 'Nicename', 'shawtheme' ),
+                $userdata->display_name,
+                $avatar
+            ),
+            sprintf( '<td colspan="2">%1$s:</td><td colspan="3">%2$s %3$s</td>',
+                __( 'Fullname', 'shawtheme' ),
+                $userdata->first_name,
+                $userdata->last_name
+            ),
+            sprintf( '<tr><td colspan="2">%1$s:</td><td colspan="3"><a href="mailto:%2$s">%2$s</a></td></tr><tr><td colspan="2">%3$s:</td><td colspan="6"><a target="_blank" href="%4$s">%4$s</a></td></tr>',
+                __( 'Email', 'shawtheme' ),
+                $userdata->user_email,
+                __( 'Website', 'shawtheme' ),
+                $userdata->user_url
+            ),
+            sprintf( '<td colspan="2">%1$s:</td><td colspan="6">%2$s</td>',
+                __( 'Description', 'shawtheme' ),
+                $userdata->description
+            )
         );
 
     } elseif ( is_date() ) {
@@ -769,10 +819,10 @@ function shawtheme_custom_sidebar() {
         $post_formats = $post_formats[0];
         foreach ( $post_formats as $post_format ) {
             $format_name   = ucfirst( $post_format );
-            $format_links .= sprintf( '<a class="format-link" href="%1$s/type/%2$s"><img src="%3$s/assets/img/post_format.jpg" alt="%4$s"><span class="format-name"><span>%4$s</span></span></a> ',
-                esc_url( home_url() ),
-                $post_format,
+            $format_links .= sprintf( '<a class="format-link" href="%1$s"><img src="%2$s/assets/img/post_format.jpg" alt="%4$s"><span class="format-name"><span class="format-%3$s">%4$s</span></span></a> ',
+                esc_url( get_post_format_link( $post_format ) ),
                 esc_url( get_template_directory_uri() ),
+                esc_attr( $post_format ),
                 _x( $format_name, 'Post format', 'default' )
             );
         }
@@ -801,7 +851,7 @@ function shawtheme_custom_sidebar() {
                     'hierarchical' => 1,
                     'separator'    => '',
                     'show_count'   => 1,
-                    'hide_empty'   => 0,
+                    // 'hide_empty'   => 0,
                     'taxonomy'     => $the_name,
                     'title_li'     => ''
                 ) )
@@ -818,7 +868,7 @@ function shawtheme_custom_sidebar() {
                     'format'     => 'list',
                     'separator'  => '',
                     'show_count' => 1,
-                    'hide_empty' => 0,
+                    // 'hide_empty' => 0,
                     'taxonomy'   => $the_name,
                     'echo'       => 0
                 ) )

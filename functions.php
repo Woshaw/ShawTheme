@@ -306,7 +306,7 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No subjects found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to subjects', 'shawtheme' )
         ),
-        'description'       => __( 'Subjects of tutorial.', 'shawtheme' ),
+        'description'       => __( 'Hierarchical taxonomy associated with tutorial.', 'shawtheme' ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
@@ -326,7 +326,7 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No labels found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to labels', 'shawtheme' )
         ),
-        'description'       => __( 'Labels of tutorial.', 'shawtheme' ),
+        'description'       => __( 'Non-hierarchical taxonomy associated with tutorial.', 'shawtheme' ),
         'show_in_rest'      => true,
         'show_admin_column' => true,
         // 'show_tagcloud'     => true
@@ -344,7 +344,7 @@ function shawtheme_custom_init() {
             'not_found'     => __( 'No genres found.', 'shawtheme' ),
             'back_to_items' => __( '← Back to genres', 'shawtheme' )
         ),
-        'description'       => __( 'Genres of resource.', 'shawtheme' ),
+        'description'       => __( 'Hierarchical taxonomy associated with resource.', 'shawtheme' ),
         'hierarchical'      => true,
         'show_in_rest'      => true,
         'show_admin_column' => true,
@@ -537,10 +537,11 @@ function shawtheme_archive_title( $title ) {
         $queried_object = get_queried_object();
         if ( $queried_object ) {
             $tax = get_taxonomy( $queried_object->taxonomy );
+            $tit = single_term_title( '', false );
             if ( in_array( $tax->name, array( 'subject', 'genre' ) ) ) {
-                $title = sprintf( __( 'Category: %s', 'default' ), single_term_title( '', false ) );
+                $title = sprintf( __( 'Category: %s', 'default' ), $tit );
             } elseif ( $tax->name == 'label' ) {
-                $title = sprintf( __( 'Tag: %s', 'default' ), single_term_title( '', false ) );
+                $title = sprintf( __( 'Tag: %s', 'default' ), $tit );
             }
         }
     }
@@ -622,7 +623,7 @@ function shawtheme_body_classes( $classes ) {
         $classes[] = 'plural';
     }
 
-    if ( is_search() || is_archive() /*&& !is_post_type_archive()*/ || is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {
+    if ( is_search() || is_archive() && !is_post_type_archive() || is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {
         $classes[] = 'has-flex-content';
     }
 
@@ -630,12 +631,16 @@ function shawtheme_body_classes( $classes ) {
         $classes[] = 'has-grid-main';
     }
 
-    if ( is_search() || is_archive() ) {
+    if ( is_search() || is_archive() && !is_post_type_archive() ) {
         $classes[] = 'has-order-main';
     }
 
     if ( is_search() || is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {
         $classes[] = 'has-ratio-main';
+    }
+
+    if ( !is_search() && is_archive() && !is_post_type_archive() ) {
+        $classes[] = 'has-percent-main';
     }
 
     if ( is_singular( 'post' ) && is_active_sidebar( 'single-sidebar' ) ) {

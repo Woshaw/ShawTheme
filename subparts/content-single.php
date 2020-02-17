@@ -15,6 +15,7 @@
 
     <div class="entry-content">
         <?php
+            shawtheme_list_pages( array( 'tag' => 'section' ) ); // Pages list section.
             the_content();
             wp_link_pages( array(
                 'before'      => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'shawtheme' ) . '</span>',
