@@ -1,6 +1,6 @@
 <?php
 /**
- * <= The template part for displaying content =>
+ * <= The template part for displaying video fromat content =>
  * @package ShawTheme
  * @since ShawTheme 1.0.0
  */
@@ -9,23 +9,13 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
     <header class="entry-header">
-        <?php
-            if ( is_sticky() && is_home() ) {
-                printf( '<span class="sticky-post screen-reader-text">%s</span>', _x( 'Featured', 'post', 'shawtheme' ) );
-            }
-
-            the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' );
-        ?>
+        <?php the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
     </header><!-- .entry-header -->
 
     <div class="entry-preview">
         <?php
         // Post thumbnail
-        $ratio = ( !is_search() && get_post_type() == 'post' ) ? '4to1' : '8to5';
-        shawtheme_thumbnail( $ratio );
-
-        // Post summary
-        shawtheme_excerpt();
+        shawtheme_thumbnail();
         ?>
     </div><!-- .entry-preview -->
 

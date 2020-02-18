@@ -42,8 +42,9 @@ if ( is_archive() || is_search() ) : ?>
                 <ul class="counts-list">
                     <?php
                         $post_types = get_post_types( array( 'public' => true, 'exclude_from_search'=> false ), 'objects' );
-                        $posts_link = get_post_type_archive_link( $post_type->name ) ? get_post_type_archive_link( $post_type->name ) : home_url( '/' );
                         foreach ( $post_types as $post_type ) {
+                            $posts_link = get_post_type_archive_link( $post_type->name );
+                            // $posts_link = $posts_link ? $posts_link : home_url( '/' );
                             $labels     = get_post_type_labels( $post_type );
                             if ( $post_type->name === 'page' || $post_type->name === 'attachment' ) { // 排除“页面”和“媒体”内容类型
                                continue;

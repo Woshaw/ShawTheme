@@ -43,7 +43,7 @@
 
             <div class="post-toolbar">
 
-                <a id="post-likes" class="likes-link <?php echo get_likes_class();?>" data-id="<?php the_id();?>" data-action="liking" href="javascript:;" ><?php _e( 'Thumbs-up', 'shawtheme' );?>(<span class="count"><?php echo post_likes_count();?></span>)</a>
+                <a id="post-likes" class="likes-link <?php echo get_likes_class();?>" data-id="<?php the_id();?>" data-action="liking" href="javascript:;" ><?php _e( 'Thumbs-up', 'shawtheme' );?>(<span class="count"><?php post_likes_count( true );?></span>)</a>
 
                 <a id="post-share" class="share-link" href="javascript:;"><?php _e( 'Share', 'shawtheme' ); ?>(<span class="BSHARE_COUNT">0</span>)</a>
 

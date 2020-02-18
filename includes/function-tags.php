@@ -292,32 +292,29 @@ function shawtheme_number_format( $num ) {
  * 4. Post Entry *
  *****************/
 //# Post thumbnail.
-function shawtheme_thumbnail() {
-    if ( is_front_page() /*&& is_sticky() && !is_paged()*/ || is_search() ) {
-        if ( has_post_thumbnail() ) {
-    ?>
-        <a class="post-thumbnail ratio-8to5-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'post-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) ); ?></a>
-        <?php }
-        else {
-            printf(
-                '<a class="post-thumbnail ratio-8to5-thumbnail" href="%1$s" aria-hidden="true"><img src="%2$s/assets/img/post_thumbnail.png" class="no-thumbnail" alt="%3$s"></a>',
-                esc_url( get_permalink() ),
-                esc_url( get_template_directory_uri() ),
-                __( 'No featured image', 'shawtheme' )
-            );
-        }
-    } elseif ( has_post_thumbnail() ) {
-    ?>
-        <a class="post-thumbnail ratio-4to1-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true"><?php the_post_thumbnail( 'entry-thumbnail', array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) ); ?></a>
-    <?php
+function shawtheme_thumbnail( string $ratio = '8to5' ) {
+
+    if ( has_post_thumbnail() ) {
+
+        $size = ( $ratio == '4to1' ) ? 'entry-thumbnail' : 'post-thumbnail';
+        printf( '<a class="post-thumbnail ratio-%1$s-thumbnail" href="%2$s" aria-hidden="true">%3$s</a>',
+            $ratio,
+            esc_url( get_permalink() ),
+            get_the_post_thumbnail( $post, $size, array( 'alt' => the_title_attribute( 'echo=0' ), 'loading' => 'lazy' ) )
+        );
+
     } else {
+
         printf(
-            '<a class="post-thumbnail ratio-4to1-thumbnail" href="%1$s" aria-hidden="true"><img src="%2$s/assets/img/entry_thumbnail.png" class="no-thumbnail" alt="%3$s"></a>',
+            '<a class="post-thumbnail ratio-%1$s-thumbnail" href="%2$s" aria-hidden="true"><img src="%3$s/assets/img/default_%1$s_thumbnail.png" class="no-thumbnail" alt="%4$s"></a>',
+            $ratio,
             esc_url( get_permalink() ),
             esc_url( get_template_directory_uri() ),
-            __( 'No featured image', 'shawtheme' )
+            __( 'Default featured image', 'shawtheme' )
         );
+
     }
+
 }
 
 //# Post excerpt.
@@ -382,7 +379,7 @@ function shawtheme_post_views() {
     }
 }
 add_action('wp_head', 'shawtheme_post_views');
-function post_views_count( $echo = false ) {
+function post_views_count( bool $echo = false ) {
     global $post;
     $views = get_post_meta( $post->ID, '_post_views', true );
     $count = $views ? number_format_i18n( $views ) : '0';
@@ -414,7 +411,7 @@ function get_likes_class() {
     global $post;
     if ( isset( $_COOKIE['post_likes_' . $post->ID] ) ) return 'liked';
 }
-function post_likes_count( $echo = false ) {
+function post_likes_count( bool $echo = false ) {
     global $post;
     $likes = get_post_meta( $post->ID, '_post_likes', true );
     $count = $likes ? number_format_i18n( $likes ) : '0';

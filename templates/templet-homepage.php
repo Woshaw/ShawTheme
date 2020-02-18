@@ -8,11 +8,11 @@
  */
 
 get_header(); 
-$more_text = __( 'More >', 'shawtheme' ); ?>
+$more_text = sprintf( '%s <span class="more-sign">&gt;</span>', __( 'More', 'shawtheme' ) ); ?>
 
     <main id="main" class="site-main" role="main">
 
-            <section id="slider" class="istop sticky-posts slider area">
+            <section id="slider" class="istop istop-sticky slider area">
                 <h2 class="istop-title screen-reader-text"><?php _e( 'Featured Posts', 'shawtheme' ); ?></h2>
                 <?php
                 // Loop 5 sticky posts for page slider.
@@ -23,7 +23,7 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                 ) );
                 if ( $sticky_posts_query->have_posts() ) : ?>
 
-                    <ul class="sticky-posts-list">
+                    <ul class="istop-sticky-list">
                         <?php
                         // Start the loop.
                         while ( $sticky_posts_query->have_posts() ) : $sticky_posts_query->the_post(); ?>
@@ -41,20 +41,14 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
 
                                     shawtheme_thumbnail();
 
-                                    edit_post_link(
-                                        sprintf(
-                                            wp_kses(
-                                                /* translators: %s: Name of current post. Only visible to screen readers */
-                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
-                                                array(
-                                                    'span' => array(
-                                                        'class' => array(),
-                                                    ),
-                                                )
-                                            ),
+                                    edit_post_link( 
+                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
+                                            __( 'Edit', 'default' ),
                                             get_the_title()
                                         ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
+                                            __( 'Edit link', 'shawtheme' )
+                                        ),
                                         '</span>'
                                     );
                                 ?>
@@ -65,7 +59,9 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                         endwhile;
                         ?>
                     </ul>
+
                     <div class="toggle-links"></div>
+
                     <nav class="nav-links" aria-label="<?php esc_attr_e( 'Slider Navigation', 'shawtheme' ); ?>">
                         <a class="prev" href="javascript:;"> &lt; </a>
                         <a class="next" href="javascript:;"> &gt; </a>
@@ -80,91 +76,91 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                                     return document.querySelector( element );
                                 }
                             }
-                            // const $slider = $( '#slider' );
-                            const $postsList = $( '.sticky-posts-list li', true );
-                            const $toggleLnks = $( '.toggle-links' );
-                            const $navLinks = $( '.nav-links' );
-                            const $length = $postsList.length;
+                            // const slider = $( '#slider' );
+                            const postsList = $( '#slider li', true );
+                            const toggleLnks = $( '#slider .toggle-links' );
+                            const navLinks = $( '#slider .nav-links' );
+                            const length = postsList.length;
 
                             let toggles = '';
-                            for( let i=0; i<$length; i++ ) {
+                            for( let i=0; i<length; i++ ) {
                                 if( i == 0 ) {
                                     toggles += '<a href="javascript:;" class="toggled-on">' + ( i+1 ) + '</a>';
                                 } else {
                                     toggles += '<a href="javascript:;">' + (i+1) + '</a>';
                                 }
                             }
-                            $toggleLnks.innerHTML = toggles;
+                            toggleLnks.innerHTML = toggles;
 
                             let current = 0;
 
                             function backward() {
-                                for( let i=0; i<$length; i++ ) {
-                                    $postsList[i].style.display = 'none';
-                                    $toggleLnks.children[i].className = '';
+                                for( let i=0; i<length; i++ ) {
+                                    postsList[i].style.display = 'none';
+                                    toggleLnks.children[i].className = '';
                                 }
                                 if( current == 0 ) {
-                                    current = $length;
+                                    current = length;
                                 }
-                                $postsList[current-1].style.display = 'block';
-                                $toggleLnks.children[current-1].className = 'toggled-on';
+                                postsList[current-1].style.display = 'block';
+                                toggleLnks.children[current-1].className = 'toggled-on';
                                 current--;
                             }
                             function forward() {
-                                for( let i=0; i<$length; i++ ) {
-                                    $postsList[i].style.display = 'none';
-                                    $toggleLnks.children[i].className = '';
+                                for( let i=0; i<length; i++ ) {
+                                    postsList[i].style.display = 'none';
+                                    toggleLnks.children[i].className = '';
                                 }
-                                if( $length == current ) {
+                                if( length == current ) {
                                     current = 0;
                                 }
-                                $postsList[current].style.display = 'block';
-                                $toggleLnks.children[current].className = 'toggled-on';
+                                postsList[current].style.display = 'block';
+                                toggleLnks.children[current].className = 'toggled-on';
                                 current++;
                             }
 
                             let timer;
                             timer = setInterval( forward, 1500 );
 
-                            for( let i=0; i<$length; i++ ) {
-                                $postsList[i].onmouseover = function() {
+                            for( let i=0; i<length; i++ ) {
+                                postsList[i].onmouseover = function() {
                                     clearInterval( timer );
                                 }
-                                $postsList[i].onmouseout = function() {
+                                postsList[i].onmouseout = function() {
                                     timer = setInterval( forward, 1500 );
                                 }
                             }
-                            for( let i=0; i<$navLinks.children.length; i++ ) {
-                                $navLinks.children[i].onmouseover = function() {
+                            for( let i=0; i<navLinks.children.length; i++ ) {
+                                navLinks.children[i].onmouseover = function() {
                                     clearInterval( timer );
                                 };
-                                $navLinks.children[i].onmouseout = function() {
+                                navLinks.children[i].onmouseout = function() {
                                     timer = setInterval( forward, 1500 );
                                 }
                             }
 
-                            for( let i=0; i<$length; i++ ) {
-                                $toggleLnks.children[i].index = i;
-                                $toggleLnks.children[i].onmouseover = function() {
+                            for( let i=0; i<length; i++ ) {
+                                toggleLnks.children[i].index = i;
+                                toggleLnks.children[i].onmouseover = function() {
                                     clearInterval( timer );
-                                    for( let i=0; i<$length; i++ ) {
-                                        $postsList[i].style.display = 'none';
-                                        $toggleLnks.children[i].className = '';
+                                    for( let i=0; i<length; i++ ) {
+                                        postsList[i].style.display = 'none';
+                                        toggleLnks.children[i].className = '';
                                     }
                                     this.className = 'toggled-on';
-                                    $postsList[this.index].style.display = 'block';
+                                    postsList[this.index].style.display = 'block';
                                     current = this.index +1;
                                 }
-                                $toggleLnks.children[i].onmouseout = function() {
+                                toggleLnks.children[i].onmouseout = function() {
                                     timer = setInterval( forward, 1500 );
                                 }
                             }
                             
-                            $navLinks.children[0].onclick = function() {
+                            navLinks.children[0].onclick = function() {
                                 backward();
                                 return false;
                             }
-                            $navLinks.children[1].onclick = function() {
+                            navLinks.children[1].onclick = function() {
                                 forward();
                                 return false;
                             }
@@ -178,12 +174,12 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                     printf( '<p class="not-found">%s<p>', __( 'No sticky post yet.', 'shawtheme' ) );
 
                 endif; ?>
-            </section><!-- .sticky-posts -->
+            </section><!-- .istop-sticky -->
 
-            <section class="istop recent-posts">
+            <section class="istop istop-posts">
                 <h2 class="istop-title screen-reader-text">
-                    <?php _e( 'Recent Posts', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                    <?php _e( 'Popular Posts', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'post' ); ?>"><?php echo $more_text; ?></a></small>
                 </h2>
                 <?php
                 // Loop 6 recent posts.
@@ -193,7 +189,7 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                 ) );
                 if ( $recent_posts_query->have_posts() ) : ?>
 
-                    <ul class="istop-list recent-posts-list">
+                    <ul class="istop-list istop-posts-list">
                         <?php
                         // Start the loop.
                         while ( $recent_posts_query->have_posts() ) : $recent_posts_query->the_post(); ?>
@@ -211,20 +207,14 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                                         '</a></h1>'
                                     );
 
-                                    edit_post_link(
-                                        sprintf(
-                                            wp_kses(
-                                                /* translators: %s: Name of current post. Only visible to screen readers */
-                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
-                                                array(
-                                                    'span' => array(
-                                                        'class' => array(),
-                                                    ),
-                                                )
-                                            ),
+                                    edit_post_link( 
+                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
+                                            __( 'Edit', 'default' ),
                                             get_the_title()
                                         ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
+                                            __( 'Edit link', 'shawtheme' )
+                                        ),
                                         '</span>'
                                     );
                                 ?>
@@ -240,15 +230,15 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                     wp_reset_postdata();
                 else :
 
-                    printf( '<p class="not-found">%s<p>', __( 'No post yet.', 'shawtheme' ) );
+                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
 
                 endif; ?>
-            </section><!-- .recent-posts -->
+            </section><!-- .istop-posts -->
 
-            <section class="istop recent-tutorials">
+            <section class="istop istop-tutorials">
                 <h2 class="istop-title">
-                    <?php _e( 'Recent Tutorials', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                    <?php _e( 'Popular Tutorials', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'tutorial' ); ?>"><?php echo $more_text; ?></a></small>
                 </h2>
                 <?php
                 // Loop 5 recent tutorials.
@@ -258,7 +248,7 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                 ) );
                 if ( $recent_tutorials_query->have_posts() ) : ?>
 
-                    <ul class="istop-list recent-tutorials-list">
+                    <ul class="istop-list istop-tutorials-list">
                         <?php
                         // Start the loop.
                         while ( $recent_tutorials_query->have_posts() ) : $recent_tutorials_query->the_post(); ?>
@@ -276,20 +266,14 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                                         '</a></h1>'
                                     );
 
-                                    edit_post_link(
-                                        sprintf(
-                                            wp_kses(
-                                                /* translators: %s: Name of current post. Only visible to screen readers */
-                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
-                                                array(
-                                                    'span' => array(
-                                                        'class' => array(),
-                                                    ),
-                                                )
-                                            ),
+                                    edit_post_link( 
+                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
+                                            __( 'Edit', 'default' ),
                                             get_the_title()
                                         ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
+                                            __( 'Edit link', 'shawtheme' )
+                                        ),
                                         '</span>'
                                     );
                                 ?>
@@ -305,15 +289,15 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                     wp_reset_postdata();
                 else :
 
-                    printf( '<p class="not-found">%s<p>', __( 'No tutorial yet.', 'shawtheme' ) );
+                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
 
                 endif; ?>
-            </section><!-- .recent-tutorials -->
+            </section><!-- .istop-tutorials -->
 
-            <section class="istop recent-resources">
+            <section class="istop istop-resources">
                 <h2 class="istop-title">
-                    <?php _e( 'Recent Resources', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="#"><?php echo $more_text; ?></a></small>
+                    <?php _e( 'Popular Resources', 'shawtheme' ); ?>
+                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'resource' ); ?>"><?php echo $more_text; ?></a></small>
                 </h2>
                 <?php
                 // Loop 5 recent resources.
@@ -323,7 +307,7 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                 ) );
                 if ( $recent_resources_query->have_posts() ) : ?>
 
-                    <ul class="istop-list recent-resources-list">
+                    <ul class="istop-list istop-resources-list">
                         <?php
                         // Start the loop.
                         while ( $recent_resources_query->have_posts() ) : $recent_resources_query->the_post(); ?>
@@ -341,20 +325,14 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                                         '</a></h1>'
                                     );
 
-                                    edit_post_link(
-                                        sprintf(
-                                            wp_kses(
-                                                /* translators: %s: Name of current post. Only visible to screen readers */
-                                                __( 'Edit <span class="screen-reader-text">%s</span>', 'shawtheme' ),
-                                                array(
-                                                    'span' => array(
-                                                        'class' => array(),
-                                                    ),
-                                                )
-                                            ),
+                                    edit_post_link( 
+                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
+                                            __( 'Edit', 'default' ),
                                             get_the_title()
                                         ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',  __( 'Edit link', 'shawtheme' ) ),
+                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
+                                            __( 'Edit link', 'shawtheme' )
+                                        ),
                                         '</span>'
                                     );
                                 ?>
@@ -370,10 +348,10 @@ $more_text = __( 'More >', 'shawtheme' ); ?>
                     wp_reset_postdata();
                 else :
 
-                    printf( '<p class="not-found">%s<p>', __( 'No resource yet.', 'shawtheme' ) );
+                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
 
                 endif; ?>
-            </section><!-- .recent-resources -->
+            </section><!-- .istop-resources -->
 
     </main><!-- .site-main -->
 
