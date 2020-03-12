@@ -10,6 +10,25 @@ get_header(); ?>
     <main id="main" class="site-main" role="main">
 
         <?php
+        // $the_type  = $post->post_type;
+        // $the_obj   = get_post_type_object( $the_type );
+        // $the_taxs  = $the_obj->taxonomies;
+        // foreach ( $the_taxs as $the_tax ) {
+        //     $tax = get_taxonomy( $the_tax );
+        //     if ( $tax->hierarchical ) { 
+        //         $taxonomy = $the_tax;
+        //         break;
+        //     }
+        // }
+        // $terms      = get_the_terms( $post->ID, $taxonomy );
+        // $the_terms  = get_term_parents_list( $terms[0]->term_id, $terms[0]->taxonomy, array( 'format' => 'slug', 'link' => false ) );
+        // $post_terms = str_replace( $the_type . '/', '', substr( $the_terms, 0, -1 ) );
+
+        // echo "<pre>";
+        // print_r($post_terms);
+        // echo "</pre>";
+
+
         //# Start the loop.
         while ( have_posts() ) : the_post();
 

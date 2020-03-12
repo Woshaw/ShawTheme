@@ -168,36 +168,80 @@ function disable_embeds_flush_rewrite_rules() {
 }
 register_deactivation_hook( __FILE__, 'disable_embeds_flush_rewrite_rules' );
 
+
+
+
 //# Rewites post url of custom post types.
-// function custom_tutorial_link( $link, $post = 0 ) {
 
-//     $the_cat  = get_the_category( $post->ID );
-//     $the_id   = $the_cat[0]->category_parent;
-//     $the_obj  = get_term( $the_id, 'category' );
-//     $cat_slug = !empty( $the_id ) ? $the_obj->slug . '/' . $the_cat[0]->slug : $the_cat[0]->slug;
-//     $the_str  = $cat_slug . '/' . $post->post_name;
+// Add our custom permastructures for custom taxonomy and post
+function shawtheme_permalink_structures() {
+    global $wp_rewrite;
+    // add_permastruct( 'subject', '%subject%' );
+    add_permastruct( 'tutorial', 'tutorial/%subject%/%tutorial%' );
+}
+add_action( 'wp_loaded', 'shawtheme_permalink_structures' );
+
+// Make sure that all links on the site, include the related texonomy terms
+function shawtheme_post_type_link( $post_link, $post ) {
+
+    if ( in_array( $post->post_type, array( 'tutorial' ) ) ) {
+
+        $the_type  = $post->post_type;
+        $the_obj   = get_post_type_object( $the_type );
+        $the_taxs  = $the_obj->taxonomies;
+        foreach ( $the_taxs as $the_tax ) {
+            $tax = get_taxonomy( $the_tax );
+            if ( $tax->hierarchical ) { 
+                $taxonomy = $the_tax;
+                break;
+            }
+        }
+        $terms      = get_the_terms( $post->ID, $taxonomy );
+        // $the_terms  = get_term_parents_list( $terms[0]->term_id, $terms[0]->taxonomy, array( 'format' => 'slug', 'link' => false ) );
+        // $post_terms = str_replace( $the_type . '/', '', substr( $the_terms, 0, -1 ) );
 
 
-//     if ( $post->post_type == 'tutorial' ) {
-//         return home_url( $the_str );
-//     } else {
-//         return $link;
-//     }
+        // $terms = get_the_terms( $post->ID, 'subject' );
+
+        if ( !$terms )
+            return str_replace( '%subject%/', '', $post_link );
+
+        $post_terms = array();
+        foreach ( $terms as $term )
+            $post_terms[] = $term->slug;
+
+        return str_replace( '%subject%', implode( ',', $post_terms ), $post_link );
+
+    }
+
+    return $post_link;
+
+}
+add_filter( 'post_type_link', 'shawtheme_post_type_link', 10, 2 );
+
+// // Make sure that all term links include their parents in the permalinks
+// function add_term_parents_to_permalinks( $termlink, $term ) {
+//     $term_parents = get_term_parents( $term );
+//     foreach ( $term_parents as $term_parent )
+//         $permlink = str_replace( $term->slug, $term_parent->slug . '/' . $term->slug, $termlink );
+//     return $permlink;
 // }
-// add_filter( 'post_type_link', 'custom_tutorial_link', 1, 2 );
-// function tutorial_rewrites_init() {
-//     add_rewrite_rule(
-//         'tutorial/([\w&%\-\/\?]+)',
-//         'index.php?post_type=tutorial&p=$matches[1]',
-//         'top'
-//     );
-//     add_rewrite_rule(
-//         'tutorial/([\w&%\-\/\?]+)/comment-page-([0-9]{1,})$',
-//         'index.php?post_type=tutorial&p=$matches[1]&cpage=$matches[2]',
-//         'top'
-//     );
+// add_filter( 'term_link', 'add_term_parents_to_permalinks', 10, 2 );
+
+// // Helper function to get all parents of a term
+// function get_term_parents( $term, &$parents = array() ) {
+//     $parent = get_term( $term->parent, $term->taxonomy );
+    
+//     if ( is_wp_error( $parent ) )
+//         return $parents;
+    
+//     $parents[] = $parent;
+//     if ( $parent->parent )
+//         get_term_parents( $parent, $parents );
+//     return $parents;
 // }
-// add_action( 'init', 'tutorial_rewrites_init' );
+
+
 
 /*********************
  * 04. Core Register *
@@ -436,6 +480,11 @@ add_action( 'save_post', 'shawtheme_save_meta_data', 10, 2 );
 /**********************
  * 05. Enqueue Assets *
  **********************/
+function shawtheme_gutenberg_scripts() {
+    wp_enqueue_script( 'shawtheme_gutenberg_script', get_template_directory_uri() . '/assets/js/custom-gutenberg-blocks.js', array( 'wp-blocks', 'wp-i18n', 'wp-editor', 'wp-element' ) );
+}
+add_action( 'enqueue_block_editor_assets', 'shawtheme_gutenberg_scripts' );
+
 function shawtheme_scripts() {
     wp_enqueue_style( 'shawicons', get_template_directory_uri() . '/assets/css/shawicons.css', array(), '1.0.0', 'all' );
 
@@ -614,6 +663,60 @@ function shawtheme_no_js_class() {
 
 }
 add_action( 'wp_head', 'shawtheme_no_js_class' );
+
+// Add classes to nav menu items.
+function shawtheme_nav_menu_classes( $classes, $item, $args ) {
+    if ( is_singular() && 'primary' === $args->theme_location ) {
+        global $post;
+        $the_url    = get_post_type_archive_link( $post->post_type );
+        $the_parent = $item->menu_item_parent;
+        $the_class  = 'current-menu-ancestor';
+        $the_object = $item->object;
+        
+        if ( $item->url == $the_url ) { // Archive link items.
+            if ( $the_parent ) {
+                $classes[] = 'current-menu-parent';
+            } else {
+                $classes[] = $the_class;
+            }
+        }
+
+        if ( $item->type == 'taxonomy' ) { // Taxonomy items.
+            $terms     = get_the_terms( $post->ID, $the_object );
+            $terms_one = array();
+            $parents   = '';
+            if ( $terms && !is_wp_error( $terms ) ) {
+                foreach ( $terms as $term ) {
+                    $term_id     = $term->term_id;
+                    $terms_one[] = $term->name;
+                    if ( $term->parent ) {
+                        $parents .= get_term_parents_list( $term_id, $the_object, array( 'separator' => ', ', 'link' => false ) );
+                    }
+                }
+            }
+            $terms_two = explode( ', ', $parents );
+            $the_terms = array_filter( array_unique( array_merge( $terms_one, $terms_two ) ) );
+            if ( in_array( $item->title, $the_terms ) ) {
+                $classes[] = $the_class;
+            }
+        }
+
+        if ( $the_object == 'page' ) { // Page with 'hierarchical' feature items.
+            $parented = $post->post_parent;
+            $pages    = array();
+            while ( $parented ) {
+                $parent_page = get_page( $parented );
+                $pages[]     = $parent_page->ID;
+                $parented    = $parent_page->post_parent;
+            }
+            if ( !in_array( $the_class, $classes ) && in_array( $item->object_id, $pages ) ) {
+                $classes[] = $the_class;
+            }
+        }
+    }
+    return $classes;
+}
+add_filter( 'nav_menu_css_class' , 'shawtheme_nav_menu_classes' , 10, 3 );
 
 //# Add classes to body.
 function shawtheme_body_classes( $classes ) {
@@ -799,3 +902,50 @@ function shawtheme_get_posts( $query ) {
     // }
 }
 add_action('pre_get_posts','shawtheme_get_posts');
+
+//# Limit post formats for specified post types.
+function get_allowed_post_formats( $type = null ) {
+    if ( $type == 'post' ) {
+        return array( 'aside', 'status', 'gallery', 'audio', 'video' );
+    } elseif ( $type == 'tutorial' ) {
+        return array( 'video' );
+    } elseif ( $type == 'resource' ) {
+        return array( 'image', 'audio', 'video', 'link' );
+    }
+    return get_theme_support( 'post-formats' )[0];
+}
+function default_post_format_filter( $format ) {
+    return in_array( $format, get_allowed_post_formats( get_post_type() ) ) ? $format : 'standard';
+}
+function shawtheme_post_formats_filter() {
+
+    $post_type = get_current_screen()->post_type;
+
+    // Bail if not on the projects screen.
+    if ( empty( $post_type ) || !in_array( $post_type, array( 'post', 'tutorial', 'resource' ) ) )
+        return;
+
+    // Check if the current theme supports formats.
+    if ( current_theme_supports( 'post-formats' ) ) {
+
+        $formats = get_theme_support( 'post-formats' );
+
+        // If we have formats, add theme support for only the allowed formats.
+        if ( isset( $formats[0] ) ) {
+            $new_formats = array_intersect( $formats[0], get_allowed_post_formats( $post_type ) );
+
+            // Remove post formats support.
+            remove_theme_support( 'post-formats' );
+
+            // If the theme supports the allowed formats, add support for them.
+            if ( $new_formats )
+                add_theme_support( 'post-formats', $new_formats );
+        }
+    }
+
+    // Filter the default post format.
+    add_filter( 'option_default_post_format', 'default_post_format_filter', 95, 1 );
+}
+add_action( 'load-post.php',     'shawtheme_post_formats_filter' );
+add_action( 'load-post-new.php', 'shawtheme_post_formats_filter' );
+add_action( 'load-edit.php',     'shawtheme_post_formats_filter' );

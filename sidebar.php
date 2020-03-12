@@ -43,16 +43,17 @@ if ( is_archive() || is_search() ) : ?>
                     <?php
                         $post_types = get_post_types( array( 'public' => true, 'exclude_from_search'=> false ), 'objects' );
                         foreach ( $post_types as $post_type ) {
-                            $posts_link = get_post_type_archive_link( $post_type->name );
-                            // $posts_link = $posts_link ? $posts_link : home_url( '/' );
-                            $labels     = get_post_type_labels( $post_type );
-                            if ( $post_type->name === 'page' || $post_type->name === 'attachment' ) { // 排除“页面”和“媒体”内容类型
+                            $type   = $post_type->name;
+                            $url    = get_post_type_archive_link( $type );
+                            $url    = $url ? $url : home_url( '/' );
+                            $labels = get_post_type_labels( $post_type );
+                            if ( $type === 'page' || $type === 'attachment' ) { // 排除“页面”和“媒体”内容类型
                                continue;
                             }
                             printf( '<li>%1$s: <a href="%2$s">%3$s</a></li>',
                                 sprintf( __( 'Total number of %1$s', 'shawtheme' ), esc_html( $labels->name ) ),
-                                esc_url( $posts_link ),
-                                count_user_posts( 1, $post_type->name, true )
+                                esc_url( $url ),
+                                count_user_posts( 1, $type, true )
                             );
                         }
                     ?>

@@ -7,26 +7,25 @@
  * @since ShawTheme 1.0.0
  */
 
-get_header(); 
-$more_text = sprintf( '%s <span class="more-sign">&gt;</span>', __( 'More', 'shawtheme' ) ); ?>
+get_header(); ?>
 
     <main id="main" class="site-main" role="main">
 
             <section id="slider" class="istop istop-sticky slider area">
                 <h2 class="istop-title screen-reader-text"><?php _e( 'Featured Posts', 'shawtheme' ); ?></h2>
                 <?php
-                // Loop 5 sticky posts for page slider.
-                $sticky_posts_query = new WP_Query( array(
+                // Loop 5 sticky posts for slider area.
+                $sticky_query = new WP_Query( array(
                     'post_type'      => 'post',
                     'post__in'       => get_option( 'sticky_posts' ),
                     'posts_per_page' => 5
                 ) );
-                if ( $sticky_posts_query->have_posts() ) : ?>
+                if ( $sticky_query->have_posts() ) : ?>
 
                     <ul class="istop-sticky-list">
                         <?php
                         // Start the loop.
-                        while ( $sticky_posts_query->have_posts() ) : $sticky_posts_query->the_post(); ?>
+                        while ( $sticky_query->have_posts() ) : $sticky_query->the_post(); ?>
 
                             <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                                 <?php
@@ -176,182 +175,79 @@ $more_text = sprintf( '%s <span class="more-sign">&gt;</span>', __( 'More', 'sha
                 endif; ?>
             </section><!-- .istop-sticky -->
 
-            <section class="istop istop-posts">
-                <h2 class="istop-title screen-reader-text">
-                    <?php _e( 'Popular Posts', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'post' ); ?>"><?php echo $more_text; ?></a></small>
-                </h2>
-                <?php
-                // Loop 6 recent posts.
-                $recent_posts_query = new WP_Query( array(
-                    'post_type'      => 'post',
-                    'posts_per_page' => 6
-                ) );
-                if ( $recent_posts_query->have_posts() ) : ?>
+            <?php
+            $post_types = get_post_types( array( 'public' => true, 'exclude_from_search'=> false ), 'objects' );
+            foreach ( $post_types as $post_type ) {
+                $type   = $post_type->name;
+                $labels = get_post_type_labels( $post_type );
+                $url    = get_post_type_archive_link( $type ); 
+                $class  = ( $type === 'post' ) ? 'screen-reader-text' : null;
+                $number = ( $type === 'post' ) ? 6 : 5;
+                $more   = sprintf( '%s <span class="more-sign">&gt;</span>', __( 'More', 'shawtheme' ) );
+                if ( in_array( $type, array( 'page', 'attachment' ) ) ) { // 排除“页面”和“媒体”内容类型
+                   continue;
+                } ?>
+                <section class="istop istop-<?php echo $type; ?>s">
+                    <h2 class="istop-title <?php echo $class; ?>">
+                        <?php printf( __( 'Popular %s', 'shawtheme' ), esc_html( $labels->name ) ); ?>
+                        <small><a class="more-link" href="<?php echo esc_url( $url ); ?>"><?php echo $more; ?></a></small>
+                    </h2>
+                    <?php
+                    // Loop specified number of featured posts.
+                    $the_query = new WP_Query( array(
+                        'post_type'      => $type,
+                        'posts_per_page' => $number
+                    ) );
+                    if ( $the_query->have_posts() ) : ?>
 
-                    <ul class="istop-list istop-posts-list">
-                        <?php
-                        // Start the loop.
-                        while ( $recent_posts_query->have_posts() ) : $recent_posts_query->the_post(); ?>
+                        <ul class="istop-list istop-<?php echo $type; ?>s-list">
+                            <?php
+                            // Start the loop.
+                            while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 
-                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                                <?php
-                                    shawtheme_thumbnail();
+                                <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                                    <?php
+                                        shawtheme_thumbnail();
 
-                                    the_title(
-                                        sprintf(
-                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
-                                            esc_url( get_permalink() ),
-                                            the_title_attribute( 'echo=0' )
-                                        ),
-                                        '</a></h1>'
-                                    );
+                                        the_title(
+                                            sprintf(
+                                                '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
+                                                esc_url( get_permalink() ),
+                                                the_title_attribute( 'echo=0' )
+                                            ),
+                                            '</a></h1>'
+                                        );
 
-                                    edit_post_link( 
-                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
-                                            __( 'Edit', 'default' ),
-                                            get_the_title()
-                                        ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
-                                            __( 'Edit link', 'shawtheme' )
-                                        ),
-                                        '</span>'
-                                    );
-                                ?>
-                            </li>
+                                        edit_post_link( 
+                                            sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
+                                                __( 'Edit', 'default' ),
+                                                get_the_title()
+                                            ),
+                                            sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
+                                                __( 'Edit link', 'shawtheme' )
+                                            ),
+                                            '</span>'
+                                        );
+                                    ?>
+                                </li>
 
-                        <?php
-                        // End the loop.
-                        endwhile;
-                        ?>
-                    </ul>
+                            <?php
+                            // End the loop.
+                            endwhile;
+                            ?>
+                        </ul>
 
-                <?php
-                    wp_reset_postdata();
-                else :
+                    <?php
+                        wp_reset_postdata();
+                    else :
 
-                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
+                        printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
 
-                endif; ?>
-            </section><!-- .istop-posts -->
-
-            <section class="istop istop-tutorials">
-                <h2 class="istop-title">
-                    <?php _e( 'Popular Tutorials', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'tutorial' ); ?>"><?php echo $more_text; ?></a></small>
-                </h2>
-                <?php
-                // Loop 5 recent tutorials.
-                $recent_tutorials_query = new WP_Query( array(
-                    'post_type'      => 'tutorial',
-                    'posts_per_page' => 5
-                ) );
-                if ( $recent_tutorials_query->have_posts() ) : ?>
-
-                    <ul class="istop-list istop-tutorials-list">
-                        <?php
-                        // Start the loop.
-                        while ( $recent_tutorials_query->have_posts() ) : $recent_tutorials_query->the_post(); ?>
-
-                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                                <?php
-                                    shawtheme_thumbnail();
-
-                                    the_title(
-                                        sprintf(
-                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
-                                            esc_url( get_permalink() ),
-                                            the_title_attribute( 'echo=0' )
-                                        ),
-                                        '</a></h1>'
-                                    );
-
-                                    edit_post_link( 
-                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
-                                            __( 'Edit', 'default' ),
-                                            get_the_title()
-                                        ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
-                                            __( 'Edit link', 'shawtheme' )
-                                        ),
-                                        '</span>'
-                                    );
-                                ?>
-                            </li>
-
-                        <?php
-                        // End the loop.
-                        endwhile;
-                        ?>
-                    </ul>
-
-                <?php
-                    wp_reset_postdata();
-                else :
-
-                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
-
-                endif; ?>
-            </section><!-- .istop-tutorials -->
-
-            <section class="istop istop-resources">
-                <h2 class="istop-title">
-                    <?php _e( 'Popular Resources', 'shawtheme' ); ?>
-                    <small><a class="more-link" href="<?php echo get_post_type_archive_link( 'resource' ); ?>"><?php echo $more_text; ?></a></small>
-                </h2>
-                <?php
-                // Loop 5 recent resources.
-                $recent_resources_query = new WP_Query( array(
-                    'post_type'      => 'resource',
-                    'posts_per_page' => 5
-                ) );
-                if ( $recent_resources_query->have_posts() ) : ?>
-
-                    <ul class="istop-list istop-resources-list">
-                        <?php
-                        // Start the loop.
-                        while ( $recent_resources_query->have_posts() ) : $recent_resources_query->the_post(); ?>
-
-                            <li id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                                <?php
-                                    shawtheme_thumbnail();
-
-                                    the_title(
-                                        sprintf(
-                                            '<h1 class="entry-title"><a href="%1$s" title="%2$s" rel="bookmark">',
-                                            esc_url( get_permalink() ),
-                                            the_title_attribute( 'echo=0' )
-                                        ),
-                                        '</a></h1>'
-                                    );
-
-                                    edit_post_link( 
-                                        sprintf( '%1$s<span class="screen-reader-text">%2$s</span>',
-                                            __( 'Edit', 'default' ),
-                                            get_the_title()
-                                        ),
-                                        sprintf( '<span class="post-editor"><span class="screen-reader-text">%s: </span>',
-                                            __( 'Edit link', 'shawtheme' )
-                                        ),
-                                        '</span>'
-                                    );
-                                ?>
-                            </li>
-
-                        <?php
-                        // End the loop.
-                        endwhile;
-                        ?>
-                    </ul>
-
-                <?php
-                    wp_reset_postdata();
-                else :
-
-                    printf( '<p class="not-found">%s<p>', __( 'No content yet.', 'shawtheme' ) );
-
-                endif; ?>
-            </section><!-- .istop-resources -->
+                    endif; ?>
+                </section><!-- .istop-<?php echo $type; ?>s -->
+            <?php
+            // endforeach.
+            } ?>
 
     </main><!-- .site-main -->
 
