@@ -173,20 +173,24 @@ register_deactivation_hook( __FILE__, 'disable_embeds_flush_rewrite_rules' );
 
 //# Rewites post url of custom post types.
 
-// Add our custom permastructures for custom taxonomy and post
-function shawtheme_permalink_structures() {
+// Custom permalink structures.
+function shawtheme_permalink_structure() {
     global $wp_rewrite;
     // add_permastruct( 'subject', '%subject%' );
-    add_permastruct( 'tutorial', 'tutorial/%subject%/%tutorial%' );
+    if ( get_option( 'permalink_structure' ) ) {
+        add_permastruct( 'tutorial', 'tutorial/%subject%/%tutorial%' );
+        add_permastruct( 'resource', 'resource/%genre%/%resource%' );
+    }
 }
-add_action( 'wp_loaded', 'shawtheme_permalink_structures' );
+add_action( 'wp_loaded', 'shawtheme_permalink_structure' );
 
-// Make sure that all links on the site, include the related texonomy terms
+// Custom post type link.
 function shawtheme_post_type_link( $post_link, $post ) {
+    
+    $the_type  = $post->post_type;
 
-    if ( in_array( $post->post_type, array( 'tutorial' ) ) ) {
+    if ( get_option( 'permalink_structure' ) && in_array( $the_type, array( 'tutorial', 'resource' ) ) ) {
 
-        $the_type  = $post->post_type;
         $the_obj   = get_post_type_object( $the_type );
         $the_taxs  = $the_obj->taxonomies;
         foreach ( $the_taxs as $the_tax ) {
@@ -196,21 +200,17 @@ function shawtheme_post_type_link( $post_link, $post ) {
                 break;
             }
         }
-        $terms      = get_the_terms( $post->ID, $taxonomy );
-        // $the_terms  = get_term_parents_list( $terms[0]->term_id, $terms[0]->taxonomy, array( 'format' => 'slug', 'link' => false ) );
-        // $post_terms = str_replace( $the_type . '/', '', substr( $the_terms, 0, -1 ) );
 
-
-        // $terms = get_the_terms( $post->ID, 'subject' );
+        $terms = get_the_terms( $post->ID, $taxonomy ); // 可用函数: shawtheme_post_terms().
 
         if ( !$terms )
-            return str_replace( '%subject%/', '', $post_link );
+            return str_replace( '%' . $taxonomy . '%', 'Uncategorized', $post_link );
 
         $post_terms = array();
         foreach ( $terms as $term )
             $post_terms[] = $term->slug;
 
-        return str_replace( '%subject%', implode( ',', $post_terms ), $post_link );
+        return str_replace( '%' . $taxonomy . '%', implode( '&', $post_terms ), $post_link );
 
     }
 
@@ -218,6 +218,22 @@ function shawtheme_post_type_link( $post_link, $post ) {
 
 }
 add_filter( 'post_type_link', 'shawtheme_post_type_link', 10, 2 );
+
+// function shawtheme_rewrite_rules() {
+//     add_rewrite_rule(
+//         'tutorial/(\S+)',
+//         'index.php?post_type=tutorial&p=$matches[1]',
+//         'top'
+//     );
+//     add_rewrite_rule(
+//         'tutorial/(\S+)/comment-page-([0-9]{1,})$',
+//         'index.php?post_type=tutorial&p=$matches[1]&cpage=$matches[2]',
+//         'top'
+//     );
+// }
+// add_action( 'init', 'shawtheme_rewrite_rules' );
+
+
 
 // // Make sure that all term links include their parents in the permalinks
 // function add_term_parents_to_permalinks( $termlink, $term ) {

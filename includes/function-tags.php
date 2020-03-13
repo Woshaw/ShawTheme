@@ -5,8 +5,85 @@
  * @since ShawTheme 1.0.0
  */
 
+/******************
+ * 1. Costom tags *
+ ******************/
+//# Get post terms.
+function shawtheme_post_terms( $args = '' ) {
+    $defaults = array(
+        'format'    => 'name',
+        'separator' => '/',
+        'link'      => 1,
+        'inclusive' => 1,
+        'echo'      => 0,
+    );
+    $parsed_args = wp_parse_args( $args, $defaults );
+
+    global $post;
+    $the_type = $post->post_type;
+    $the_obj  = get_post_type_object( $the_type );
+    $the_taxs = $the_obj->taxonomies;
+    foreach ( $the_taxs as $the_tax ) {
+        $tax = get_taxonomy( $the_tax );
+        if ( $tax->hierarchical ) { 
+            $taxonomy = $the_tax;
+            break;
+        }
+    }
+    $terms      = get_the_terms( $post->ID, $taxonomy );
+    $the_terms  = get_term_parents_list( $terms[0]->term_id, $terms[0]->taxonomy, array(
+        'format'    => $parsed_args['format'],
+        'separator' => $parsed_args['separator'],
+        'link'      => $parsed_args['link'],
+        'inclusive' => $parsed_args['inclusive'],
+    ) );
+
+    if ( !$terms || is_wp_error( $terms ) || is_wp_error( $the_terms ) ) {
+        return false;
+    }
+
+    // $post_terms = str_replace( $the_type . $parsed_args['separator'], '', substr( $the_terms, 0, -1 ) );
+
+    return $the_terms;
+}
+
+//# Custom time format.
+function shawtheme_time_format( $ptime ) {
+    $ptime = strtotime( $ptime );
+    $etime = time() - $ptime;
+    if ( $etime < 1 ) return __( 'just now', 'shawtheme' );
+    $intervals = array (
+        12 * 30 * 24 * 60 * 60  =>  __( 'years ago', 'shawtheme' ),
+        30 * 24 * 60 * 60       =>  __( 'months ago', 'shawtheme' ),
+        7 * 24 * 60 * 60        =>  __( 'weeks ago', 'shawtheme' ),
+        24 * 60 * 60            =>  __( 'days ago', 'shawtheme' ),
+        60 * 60                 =>  __( 'hours ago', 'shawtheme' ),
+        60                      =>  __( 'minutes ago', 'shawtheme' ),
+        1                       =>  __( 'seconds ago', 'shawtheme' )
+    );
+    foreach ( $intervals as $secs => $str ) {
+        $d = $etime / $secs;
+        if ( $d >= 1 ) {
+            $r = round( $d );
+            return $r . $str;
+        }
+    };
+}
+
+//# Custom number format
+function shawtheme_number_format( $num ) {
+    if ( $num >= 10000 ) {
+        $num = round( $num / 10000 * 100 ) / 100 .'W';
+    } elseif( $num >= 1000 ) {
+        $num = round( $num / 1000 * 100 ) / 100 . 'K';
+    } else {
+        $num = $num;
+    }
+    return $num;
+}
+
 /***************
- * 1. Headline *
+ * 2. Headline *
  ***************/
 function shawtheme_headline() {
     global $wp_query;
@@ -69,7 +146,7 @@ function shawtheme_headline() {
 }
 
 /******************
- * 2. Breadcrumbs *
+ * 3. Breadcrumbs *
  ******************/
 function shawtheme_breadcrumbs() {
     if ( !is_front_page() || is_paged() ) {
@@ -178,6 +255,15 @@ function shawtheme_breadcrumbs() {
         } elseif ( is_singular() ) {
             global $post;
             $parented = $post->post_parent;
+            $the_type = $post->post_type;
+            $the_obj  = get_post_type_object( $the_type );
+
+            // if ( in_array( $the_type, array( 'post', 'tutorial', 'resource' ) ) ) { //# Post type of the post.
+            //     $url     = get_post_type_archive_link( $the_type );
+            //     $url     = $url ? $url : home_url( '/' );
+            //     $name    = ( $the_type == 'post' ? __( 'Blog', 'shawtheme' ) : $the_obj->label );
+            //     $output .= sprintf( '<a href="%1$s">%2$s</a>%3$s', $url, $name, $delimiter );
+            // }
 
             $parent_post = get_post( $parented );
             $categories  = $parented ? get_the_category( $parent_post->ID ) : get_the_category();
@@ -187,14 +273,10 @@ function shawtheme_breadcrumbs() {
                 $output .= str_replace ( '<a', '<a class="category-link"', $parents );
             }
 
-            if ( in_array( get_post_type(), array( 'tutorial', 'resource' ) ) ) { //# Taxonomies of custom post type.
-                $the_tax     = get_post_type() == 'tutorial' ? 'subject' : 'genre';
-                $the_terms   = get_the_terms( $post->ID, $the_tax );
-                $the_term    = $the_terms[0];
-                $the_id      = $the_term->term_id;
-                $the_parents = get_term_parents_list( $the_id, $the_tax, array( 'separator' => $delimiter ) );
-                if ( !is_wp_error( $the_parents ) ) { //# Taxonomies of single post with custom post type.
-                    $output .= str_replace( '<a', '<a class="taxonomy-link"', $the_parents ); 
+            if ( in_array( $the_type, array( 'tutorial', 'resource' ) ) ) { //# Taxonomy terms of custom post type.
+                $post_terms = shawtheme_post_terms( array( 'separator' => $delimiter ) );
+                if ( $post_terms ) { //# Terms of custom post type single post.
+                    $output .= str_replace( '<a', '<a class="taxonomy-link"', $post_terms ); 
                 }
             }
 
@@ -248,44 +330,6 @@ function shawtheme_breadcrumbs() {
 
         echo $output;
     }
-}
-
-/******************
- * 3. Format tags *
- ******************/
-//# Custom time format.
-function shawtheme_time_format( $ptime ) {
-    $ptime = strtotime( $ptime );
-    $etime = time() - $ptime;
-    if ( $etime < 1 ) return __( 'just now', 'shawtheme' );
-    $intervals = array (
-        12 * 30 * 24 * 60 * 60  =>  __( 'years ago', 'shawtheme' ),
-        30 * 24 * 60 * 60       =>  __( 'months ago', 'shawtheme' ),
-        7 * 24 * 60 * 60        =>  __( 'weeks ago', 'shawtheme' ),
-        24 * 60 * 60            =>  __( 'days ago', 'shawtheme' ),
-        60 * 60                 =>  __( 'hours ago', 'shawtheme' ),
-        60                      =>  __( 'minutes ago', 'shawtheme' ),
-        1                       =>  __( 'seconds ago', 'shawtheme' )
-    );
-    foreach ( $intervals as $secs => $str ) {
-        $d = $etime / $secs;
-        if ( $d >= 1 ) {
-            $r = round( $d );
-            return $r . $str;
-        }
-    };
-}
-
-//# Custom number format
-function shawtheme_number_format( $num ) {
-    if ( $num >= 10000 ) {
-        $num = round( $num / 10000 * 100 ) / 100 .'W';
-    } elseif( $num >= 1000 ) {
-        $num = round( $num / 1000 * 100 ) / 100 . 'K';
-    } else {
-        $num = $num;
-    }
-    return $num;
 }
 
 /*****************
@@ -872,24 +916,4 @@ function shawtheme_custom_sidebar() {
             );
         }
     }
-}
-
-
-// Get terms functiion.
-function shawtheme_post_terms( $post ) {
-    $the_type  = $post->post_type;
-    $the_obj   = get_post_type_object( $the_type );
-    $the_taxs  = $the_obj->taxonomies;
-    foreach ( $the_taxs as $the_tax ) {
-        $tax = get_taxonomy( $the_tax );
-        if ( $tax->hierarchical ) { 
-            $taxonomy = $the_tax;
-            break;
-        }
-    }
-    $terms      = get_the_terms( $post->ID, $taxonomy );
-    $the_terms  = get_term_parents_list( $terms[0]->term_id, $terms[0]->taxonomy, array( 'format' => 'slug', 'link' => false ) );
-    $post_terms = str_replace( $the_type . '/', '', substr( $the_terms, 0, -1 ) );
-
-    return $post_terms;
 }
